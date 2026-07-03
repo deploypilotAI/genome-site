@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genome — Independent Examination of Revenue</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,700;0,800;1,500;1,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+:root{
+  --paper:#EDF1E8; --paper2:#F5F7F1; --rule:#C6D3C0; --ink:#17241D;
+  --mut:#5C6C60; --red:#AE241C; --redsoft:#F6E7E5; --grn:#2C664B;
+  --grnsoft:#E1ECE4;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+#top,#s01,#s02,#s04,#s05{scroll-margin-top:78px}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:'Spectral',Georgia,serif;line-height:1.6;font-size:17px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .025 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E")}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:880px;margin:0 auto;padding:0 22px}
+.sec{padding:88px 0}
+.secno{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);margin-bottom:14px}
+.secno::before{content:"§ "}
+h2{font-size:clamp(30px,5vw,46px);font-weight:800;line-height:1.08;letter-spacing:-.015em;margin-bottom:14px}
+.lede{font-size:17px;color:var(--mut);max-width:600px}
+.fn{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--red);vertical-align:super;margin-left:2px}
+hr.double{border:0;border-top:1px solid var(--ink);border-bottom:3px double var(--ink);height:5px;margin:0}
+.btn{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;letter-spacing:.02em;
+  border:1.5px solid var(--ink);border-radius:2px;padding:13px 26px;color:var(--ink);text-decoration:none;background:transparent;cursor:pointer;transition:all .15s}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{background:var(--red);border-color:var(--red)}
+.btn.red{border-color:var(--red);color:var(--red)}
+.btn.red:hover{background:var(--red);color:var(--paper)}
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s cubic-bezier(.2,.7,.3,1),transform .6s cubic-bezier(.2,.7,.3,1)}
+.reveal.on{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{transition:none;opacity:1;transform:none}}
+
+/* masthead */
+.mast{border-bottom:1px solid var(--rule);padding:16px 0;position:sticky;top:0;z-index:10;
+  background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(10px)}
+.mast .wrap{display:flex;justify-content:space-between;align-items:baseline}
+.mast .logo{font-weight:800;font-size:20px}
+.mast .logo i{color:var(--red);font-style:normal}
+.mnav{display:flex;gap:16px}
+.mnav a{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);text-decoration:none}
+.mnav a:hover{color:var(--red)}
+.mast .tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut)}
+
+/* the letter opening */
+.letter{padding:96px 0 72px;border-bottom:1px solid var(--rule)}
+.salutation{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--mut);margin-bottom:26px}
+.letter h1{font-size:clamp(40px,8.5vw,86px);font-weight:800;line-height:1.02;letter-spacing:-.02em;margin-bottom:8px}
+.letter h1 .u{position:relative;white-space:nowrap}
+.letter h1 .u svg{position:absolute;left:0;bottom:-4px;width:100%;height:12px;overflow:visible}
+.letter h1 .u path{stroke:var(--red);stroke-width:3.5;fill:none;stroke-linecap:round;
+  stroke-dasharray:1000;stroke-dashoffset:1000;animation:draw 1s .7s cubic-bezier(.3,.7,.4,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media(prefers-reduced-motion:reduce){.letter h1 .u path{animation:none;stroke-dashoffset:0}}
+.letter .opinion{font-size:clamp(18px,2.6vw,22px);font-style:italic;max-width:640px;margin:26px 0 8px}
+.letter .opinion b{color:var(--red);font-style:normal;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.letter .ctas{margin-top:34px;display:flex;gap:12px;flex-wrap:wrap}
+.creds{margin-top:42px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;color:var(--mut);
+  display:flex;gap:22px;flex-wrap:wrap}
+.creds span::before{content:"✓ ";color:var(--grn)}
+
+/* ticker */
+.ticker{border-bottom:1px solid var(--rule);overflow:hidden;padding:10px 0;background:var(--paper2)}
+.ticker .in{display:flex;gap:44px;white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--mut);
+  animation:tick 36s linear infinite;width:max-content}
+@keyframes tick{to{transform:translateX(-50%)}}
+.ticker b{color:var(--red);font-weight:600}
+@media(prefers-reduced-motion:reduce){.ticker .in{animation:none}}
+
+/* schedule of findings (demo) */
+.sched{background:var(--paper2);border:1px solid var(--rule);padding:30px;margin-top:30px;position:relative}
+.sched .colhead{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--mut);padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.li{display:flex;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.li .idx{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mut);width:26px;flex:none}
+.li .acct{font-weight:700;font-size:16px}
+.li .why{color:var(--mut);font-size:13px;font-style:italic}
+.li .amt{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--red);white-space:nowrap}
+.totrow{display:flex;justify-content:space-between;padding:14px 0 6px;align-items:baseline}
+.totrow .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+.totrow .val{font-family:'IBM Plex Mono',monospace;font-size:clamp(26px,4.5vw,36px);font-weight:600;color:var(--red)}
+.stamp{position:absolute;top:22px;right:22px;border:2.5px solid var(--grn);color:var(--grn);border-radius:50%;
+  width:86px;height:86px;display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.08em;line-height:1.4;
+  transform:rotate(-9deg);opacity:0}
+.stamp.show{animation:stampIn .5s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes stampIn{0%{opacity:0;transform:rotate(-9deg) scale(1.7)}60%{opacity:.92;transform:rotate(-9deg) scale(.95)}100%{opacity:.92;transform:rotate(-9deg) scale(1)}}
+@media(prefers-reduced-motion:reduce){.stamp.show{animation:none;opacity:.92}}
+
+/* upload demo */
+.updrop{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:26px}
+.updrop label{border:1.5px dashed var(--mut);padding:22px;text-align:center;cursor:pointer;background:var(--paper2);transition:border-color .15s}
+.updrop label:hover{border-color:var(--red)}
+.updrop .fn2{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--mut)}
+.updrop .cta2{font-weight:700;font-size:14px;margin-top:5px}
+.mapnote{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--mut);margin-top:14px;word-break:break-word}
+.privline{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--grn);margin-top:10px}
+.scopeline{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mut);margin-top:14px}
+
+/* basis / notes grid */
+.basis{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:30px}
+.basis>div{background:var(--paper2);padding:22px}
+.basis b{display:block;font-size:15px;margin-bottom:6px;font-weight:700}
+.basis p{font-size:13px;color:var(--mut);line-height:1.55}
+.basis .k{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--red);letter-spacing:.14em;margin-bottom:8px;display:block}
+
+/* terms of engagement (pricing) */
+.terms{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:32px}
+.term{border:1px solid var(--rule);background:var(--paper2);padding:26px;display:flex;flex-direction:column}
+.term.hot{border:1.5px solid var(--ink);box-shadow:6px 6px 0 var(--rule)}
+.term .tname{font-weight:800;font-size:21px}
+.term .tdesc{font-size:12.5px;color:var(--mut);font-style:italic;margin:4px 0 16px}
+.term ul{list-style:none;flex:1;font-size:13.5px}
+.term li{padding:7px 0;border-bottom:1px dotted var(--rule);color:var(--mut)}
+.term li b{color:var(--ink)}
+.term .price{margin-top:18px;padding-top:10px}
+.term .price .p{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600}
+.term .price .per{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mut)}
+.term .btn{margin-top:16px;text-align:center}
+
+/* notes (faq) */
+.note{padding:16px 0;border-bottom:1px solid var(--rule)}
+.note summary{cursor:pointer;list-style:none;display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:baseline}
+.note summary::-webkit-details-marker{display:none}
+.note .no{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--red)}
+.note .q{font-weight:700;font-size:16px}
+.note .q::after{content:"  +";color:var(--red);font-weight:400}
+.note[open] .q::after{content:"  −"}
+.note p{font-size:14px;color:var(--mut);margin:10px 0 4px 76px;max-width:600px}
+@media(max-width:560px){.note summary{grid-template-columns:1fr;gap:4px}.note p{margin-left:0}}
+
+/* closing */
+.close{padding:100px 0;text-align:left}
+.close h2{font-size:clamp(34px,6vw,58px)}
+.sig{margin-top:44px;font-style:italic;font-size:18px}
+.sig .mono{font-style:normal;font-size:11px;color:var(--mut);margin-top:6px}
+footer{border-top:1px solid var(--rule);padding:28px 0;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--mut)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+
+<div class="mast"><div class="wrap">
+  <div class="logo"><a href="#top" style="color:inherit;text-decoration:none">GENOME<i>.</i></a></div>
+  <div class="mnav">
+    <a href="#s01">Findings</a><a href="#s02">Try&nbsp;it</a><a href="#s04">Engage</a><a href="#s05">Notes</a>
+  </div>
+</div></div>
+
+<header class="letter" id="top"><div class="wrap">
+  <div class="salutation">TO THE CHIEF FINANCIAL OFFICER:</div>
+  <h1>Your billing does not<br>match your <span class="u">contracts.<svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M2 8 Q 50 2 100 7 T 198 6"/></svg></span></h1>
+  <p class="opinion">In our examination of companies operating Salesforce alongside Zuora, Stripe, or NetSuite, we find between <b>1% and 5%</b> of contracted revenue diverging between the quote that was approved and the invoices that followed. We identify the divergence, in dollars, per account, with evidence.</p>
+  <div class="ctas">
+    <a class="btn primary" href="#s01">Read the findings ↓</a>
+    <a class="btn" href="#s04">Terms of engagement</a>
+  </div>
+  <div class="creds">
+    <span>No AI in the money path</span><span>Hash-chained evidence</span><span>Runs in your VPC</span><span>Zero-access pilot</span>
+  </div>
+</div></header>
+
+<div class="ticker"><div class="in" id="ticker"></div></div>
+
+<section class="sec" id="s01"><div class="wrap reveal">
+  <div class="secno">01 · Schedule of Findings</div>
+  <h2>Specimen examination.<span class="fn">1</span></h2>
+  <p class="lede">A representative quarter, four accounts, two systems. Press the button; read what the ledger says.</p>
+  <div class="sched">
+    <div class="stamp" id="stamp">evidence<br>chain<br>verified</div>
+    <div class="colhead"><span>Account · Nature of finding</span><span>Amount</span></div>
+    <div id="rows"></div>
+    <div class="totrow"><span class="lbl">Total exposure, Q1</span><span class="val mono" id="counter">$0</span></div>
+    <hr class="double">
+    <div style="margin-top:20px"><button class="btn red" id="run">Run the specimen examination</button></div>
+  </div>
+</div></section>
+
+<section class="sec" id="s02" style="background:var(--paper2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)"><div class="wrap reveal">
+  <div class="secno">02 · Examination of Your Records</div>
+  <h2>Conducted entirely<br>within your browser.<span class="fn">2</span></h2>
+  <p class="lede">Drop a quote export and an invoice export. Columns identify themselves; the reconciliation runs on your device. Nothing uploads. Nothing persists. Refresh, and it never happened.</p>
+  <div class="updrop">
+    <label><input type="file" accept=".csv" id="qfile" hidden>
+      <div class="fn2" id="qname">quotes export · .csv</div><div class="cta2">Choose quotes file</div></label>
+    <label><input type="file" accept=".csv" id="ifile" hidden>
+      <div class="fn2" id="iname">invoices export · .csv</div><div class="cta2">Choose invoices file</div></label>
+  </div>
+  <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn red" id="runReal" disabled>Examine my records</button>
+    <button class="btn" id="sample">Use specimen data</button>
+  </div>
+  <div class="privline">▸ your files never leave this page — view source and verify</div>
+  <div class="mapnote" id="mapinfo"></div>
+  <div class="sched" id="realSched" style="display:none;margin-top:22px">
+    <div class="colhead"><span>Account · Nature of finding</span><span>Amount</span></div>
+    <div id="realRows"></div>
+    <div class="totrow"><span class="lbl">Total exposure</span><span class="val mono" id="realTotal">$0</span></div>
+    <hr class="double">
+  </div>
+  <div class="scopeline">browser scope: monthly billing · price, quantity, missing-line, unknown-quote checks. the engagement engine adds credit netting, amendments, ramps, usage rates, billing windows, currencies.</div>
+</div></section>
+
+<section class="sec"><div class="wrap reveal">
+  <div class="secno">03 · Basis of Opinion</div>
+  <h2>Our methods.</h2>
+  <p class="lede">The examiner cannot be the examined. Your CPQ will not audit your billing; your billing will not audit your CPQ. Independence is not a feature of this instrument — it is the instrument.</p>
+  <div class="basis">
+    <div><span class="k">III.a</span><b>Deterministic core</b><p>Every price, verdict, and finding is computed by versioned, pure functions. Language models parse language; they are structurally unable to produce a number. There is no field in any model output where a price can enter.</p></div>
+    <div><span class="k">III.b</span><b>Hash-chained evidence</b><p>Each decision is bound to the one before it. Alter any historical record and the chain breaks from that point forward — detectably, provably, permanently.</p></div>
+    <div><span class="k">III.c</span><b>Reproducible to the cent</b><p>Every calculation is stamped with its pricing and policy version, both immutably registered. Any figure from any date can be re-derived on demand — byte for byte.</p></div>
+    <div><span class="k">III.d</span><b>Confined to your premises</b><p>Deploys by container inside your network, behind your SSO. In pilot form it requires no access whatsoever: two exported files, examined and returned.</p></div>
+  </div>
+</div></section>
+
+<section class="sec" id="s04" style="background:var(--paper2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)"><div class="wrap reveal">
+  <div class="secno">04 · Terms of Engagement</div>
+  <h2>The first finding is free.</h2>
+  <p class="lede">If we find nothing, you owe nothing and sleep better. If we find something, the schedule of findings will argue our case more persuasively than we could.</p>
+  <div class="terms">
+    <div class="term">
+      <div class="tname">Pilot Examination</div>
+      <div class="tdesc">two exports in, findings out — within 48 hours</div>
+      <ul><li>Anonymized quote + invoice exports</li><li>Dollarized schedule of findings</li><li>Every line traceable to its quote</li><li><b>No access. No install. No call.</b></li><li>One pilot per company</li></ul>
+      <div class="price"><hr class="double"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="p">$0</span><span class="per">one engagement</span></div></div>
+      <a class="btn primary" href="mailto:hello@genomerevenue.com?subject=Pilot%20examination%20request&body=Hi%20DC%2C%0A%0AWe%27d%20like%20the%20free%20pilot%20examination.%0A%0AQuotes%20live%20in%3A%20%5BSalesforce%20%2F%20CPQ%20%2F%20other%5D%0ABilling%20lives%20in%3A%20%5BZuora%20%2F%20Stripe%20%2F%20NetSuite%20%2F%20other%5D%0ABilling%20cadence%3A%20%5Bmonthly%20%2F%20annual%20%2F%20mixed%5D%0A%0AWe%27ll%20attach%20two%20anonymized%20exports%20%28quotes%20%2B%20invoices%29.%0A%0AThanks%2C">Submit exports →</a>
+    </div>
+    <div class="term hot">
+      <div class="tname">Continuous Examination</div>
+      <div class="tdesc">every invoice, every night — priced by the revenue we watch, never by seats</div>
+      <ul>
+        <li>Up to <b>$5M</b> billing reconciled — <b>$750/mo</b></li>
+        <li>Up to <b>$25M</b> — <b>$2,000/mo</b></li>
+        <li>Up to <b>$100M</b> — <b>$4,000/mo</b></li>
+        <li>4 connected systems included · +$250/mo each add’l</li>
+        <li>Annual prepay: <b>two months free</b></li>
+      </ul>
+      <div class="price"><hr class="double"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="p">from $750</span><span class="per">per month · unlimited users</span></div></div>
+      <a class="btn primary" href="mailto:hello@genomerevenue.com?subject=Continuous%20examination&body=Hi%20DC%2C%0A%0AWe%20ran%20the%20pilot%20%28or%20want%20to%20skip%20straight%20to%20monitoring%29.%0A%0ASystems%20to%20connect%3A%20%0ATeam%20size%3A%20%0A%0AThanks%2C">Begin engagement →</a>
+    </div>
+    <div class="term">
+      <div class="tname">Resident Examiner</div>
+      <div class="tdesc">the full instrument, inside your VPC</div>
+      <ul><li>Container deployment, your SSO</li><li>Deal-desk governance agent</li><li>Period close, evidence packages, SOD controls</li><li>Policy registry & re-evaluation sweeps</li><li>Evidence graph & blast-radius analysis</li></ul>
+      <div class="price"><hr class="double"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="p">from $75K</span><span class="per">per year</span></div></div>
+      <a class="btn" href="mailto:hello@genomerevenue.com?subject=Resident%20examiner%20%28VPC%29&body=Hi%20DC%2C%0A%0AWe%27re%20interested%20in%20the%20self-hosted%20deployment.%0A%0ACloud%3A%20%5BAWS%20%2F%20GCP%20%2F%20Azure%5D%0AIdP%20%2F%20SSO%3A%20%0ACompliance%20requirements%3A%20%0A%0AThanks%2C">Correspond →</a>
+    </div>
+  </div>
+  <div style="margin-top:26px;border:1px solid var(--rule);background:var(--paper);padding:20px 22px">
+    <div class="secno" style="margin-bottom:8px">04.b · Backlog Recovery — the no-budget path</div>
+    <p style="font-size:14px;max-width:640px">Found prior-period leakage in the pilot but no budget line to fix it? We recover it on contingency: <b>15% of recovered prior-period dollars, capped at $25,000</b> — attribution proven by the recovery ledger, every recovered dollar traceable to its finding. Recovery fees credit toward your first year of Continuous Examination.</p>
+  </div>
+  <div class="mono" style="font-size:10.5px;color:var(--mut);margin-top:18px">fair use: tiers assume up to 50,000 invoice lines/mo · no per-seat pricing, ever · prices held for the length of any annual term</div>
+</div></section>
+
+<section class="sec" id="s05"><div class="wrap reveal">
+  <div class="secno">05 · Notes to the Examination</div>
+  <h2>Anticipated questions.</h2>
+  <div style="margin-top:24px">
+    <details class="note"><summary><span class="no">NOTE 1</span><span class="q">Is AI making pricing or approval decisions?</span></summary><p>No — structurally. Models parse language, suggest mappings, and draft prose. Prices, verdicts, and findings come from deterministic, versioned engines. No model output contains a field through which a number can reach the money path.</p></details>
+    <details class="note"><summary><span class="no">NOTE 2</span><span class="q">What is your source of truth when my systems disagree?</span></summary><p>Neither system. Your CRM owns quotes; your billing owns invoices. The disagreement between them — quantified, per account, with evidence — is the product. We are an instrument of verification, not a fourth system of record.</p></details>
+    <details class="note"><summary><span class="no">NOTE 3</span><span class="q">Sales owns Salesforce; Finance owns billing. Problem?</span></summary><p>The normal case, and the pilot is designed for it: each team exports one report from its own system. No shared access, no security review, no cross-team negotiation. Read-only connections come later, if the first schedule of findings justifies them.</p></details>
+    <details class="note"><summary><span class="no">NOTE 4</span><span class="q">What about legitimate exceptions?</span></summary><p>One disposition marks a finding as expected; suppression is scoped to that exact account, item, and issue class — never blanket — and the suppression itself is recorded in the evidence chain. Fixed issues that recur re-flag deliberately.</p></details>
+    <details class="note"><summary><span class="no">NOTE 5</span><span class="q">Can our auditors reproduce your figures?</span></summary><p>Yes. Every figure is stamped with the pricing and policy versions in force when it was computed, both immutably registered. Re-derivation is one operation and agrees to the cent.</p></details>
+  </div>
+</div></section>
+
+<section class="close" style="border-top:1px solid var(--rule)"><div class="wrap reveal">
+  <div class="secno">In Closing</div>
+  <h2>Find out what is leaking,<br>before your auditors do.</h2>
+  <p class="lede" style="margin-top:14px">Two exports. Forty-eight hours. One figure your CFO will repeat in the next staff meeting.</p>
+  <div style="margin-top:30px"><a class="btn primary" href="mailto:hello@genomerevenue.com?subject=Pilot%20examination%20request&body=Hi%20DC%2C%0A%0AWe%27d%20like%20the%20free%20pilot%20examination.%0A%0AQuotes%20live%20in%3A%20%5BSalesforce%20%2F%20CPQ%20%2F%20other%5D%0ABilling%20lives%20in%3A%20%5BZuora%20%2F%20Stripe%20%2F%20NetSuite%20%2F%20other%5D%0ABilling%20cadence%3A%20%5Bmonthly%20%2F%20annual%20%2F%20mixed%5D%0A%0AWe%27ll%20attach%20two%20anonymized%20exports%20%28quotes%20%2B%20invoices%29.%0A%0AThanks%2C">Request the pilot examination</a></div>
+  <div class="sig">Respectfully submitted,<br><b>Genome</b> — Independent Revenue Examiners
+    <div class="mono">deterministic core · agentic shell · est. 2026</div></div>
+</div></section>
+
+<footer><div class="wrap">
+  <span>GENOME. — <a href="mailto:hello@genomerevenue.com" style="color:var(--mut)">hello@genomerevenue.com</a></span>
+  <span><a href="#s01" style="color:var(--mut);text-decoration:none">§01 Findings</a> · <a href="#s02" style="color:var(--mut);text-decoration:none">§02 Try it</a> · <a href="#s04" style="color:var(--mut);text-decoration:none">§04 Engage</a> · <a href="#s05" style="color:var(--mut);text-decoration:none">§05 Notes</a></span>
+</div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+// ── ticker ──
+const KINDS=["billed at list, not contract","approved but never invoiced","duplicate billing, same period","usage billed off committed rate","quantity drift since amendment","billing with no approved quote","credit memo never applied","ramp segment mispriced"];
+$("ticker").innerHTML=(KINDS.concat(KINDS)).map(k=>`<span>▸ <b>finding:</b> ${k}</span>`).join("");
+// ── scroll reveals ──
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("on");io.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+// ── specimen examination ──
+const F=[{who:"Northwind Trading",why:"month 3 billed at list price, not the contracted rate",amt:2160},
+ {who:"Globex Systems",why:"underbilled quantity since the February amendment",amt:1710},
+ {who:"Umbrella Health",why:"invoiced against a quote absent from the CRM",amt:1200},
+ {who:"Initech LLC",why:"February was never invoiced at all",amt:950}];
+const TOTAL=F.reduce((s,f)=>s+f.amt,0);
+let ran=false;
+$("run").addEventListener("click",()=>{if(ran)return;ran=true;
+ const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+ $("run").textContent="Examining…";
+ F.forEach((f,i)=>{setTimeout(()=>{
+   const d=document.createElement("div");d.className="li reveal";
+   d.innerHTML=`<div style="display:flex;gap:10px;align-items:baseline"><span class="idx">${String(i+1).padStart(2,"0")}</span><span><span class="acct">${f.who}</span><br><span class="why">${f.why}</span></span></div><span class="amt">$${f.amt.toLocaleString()}</span>`;
+   $("rows").appendChild(d);requestAnimationFrame(()=>d.classList.add("on"));
+ },reduce?0:350+i*260);});
+ const t0=performance.now(),dur=reduce?0:1500;
+ (function tick(t){const p=dur?Math.min(1,(t-t0)/dur):1,e=1-Math.pow(1-p,3);
+  $("counter").textContent="$"+Math.round(TOTAL*e).toLocaleString();
+  if(p<1)requestAnimationFrame(tick);})(t0);
+ setTimeout(()=>{$("stamp").classList.add("show");
+  $("run").textContent="Examination complete — every line traceable";$("run").disabled=true;},reduce?0:1700);});
+// ── real in-browser examination ──
+const SYN={quote_id:["quote id","quote number","quote no","proposal id","created from","quote"],
+ invoice_id:["invoice id","invoice number","document number","id","invoice no"],
+ account:["account","account name","customer","company","client"],
+ sku:["sku","product code","item","product","charge name","line item sku"],
+ quantity:["quantity","qty","units","seats"],
+ unit_price:["unit price","sales price","net unit price","rate","price","unit amount"],
+ total:["total","amount","line total","amount due","charge amount"]};
+const normH=h=>h.toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const money=s=>{s=String(s).trim();const neg=/^\(.*\)$/.test(s);s=s.replace(/[^\d.,-]/g,"");
+ if(s.includes(",")&&s.includes(".")){s=s.lastIndexOf(",")>s.lastIndexOf(".")?s.replace(/\./g,"").replace(",","."):s.replace(/,/g,"");}
+ else if(s.includes(",")){s=/,\d{2}$/.test(s)?s.replace(",","."):s.replace(/,/g,"");}
+ const v=parseFloat(s||"0");return neg?-v:v;};
+function parseCSV(text){const rows=[];let row=[],cell="",q=false;
+ for(let i=0;i<text.length;i++){const c=text[i];
+  if(q){if(c==='"'&&text[i+1]==='"'){cell+='"';i++;}else if(c==='"')q=false;else cell+=c;}
+  else if(c==='"')q=true;else if(c===","){row.push(cell);cell="";}
+  else if(c==="\n"||c==="\r"){if(cell||row.length){row.push(cell);rows.push(row);row=[];cell="";}if(c==="\r"&&text[i+1]==="\n")i++;}
+  else cell+=c;}
+ if(cell||row.length){row.push(cell);rows.push(row);}
+ const[h,...data]=rows;return data.filter(r=>r.length>1).map(r=>Object.fromEntries(h.map((k,i)=>[k,r[i]??""])));}
+function autoMap(rows,fields){const headers=Object.keys(rows[0]||{});const map={};
+ for(const f of fields){let best=null,bs=0;
+  for(const h of headers){const n=normH(h);let s=0;
+   if(SYN[f].includes(n))s=.95;else if(SYN[f].some(x=>x.length>3&&(n.includes(x)||x.includes(n))))s=.7;
+   if(s>bs&&!Object.values(map).includes(h)){bs=s;best=h;}}
+  if(best&&bs>=.7)map[f]=best;}
+ return map;}
+let qRows=null,iRows=null;
+const ready=()=>{$("runReal").disabled=!(qRows&&iRows);};
+[["qfile","qname",r=>{qRows=r;}],["ifile","iname",r=>{iRows=r;}]].forEach(([fid,nid,set])=>{
+ $(fid).addEventListener("change",()=>{const f=$(fid).files[0];if(!f)return;
+  $(nid).textContent=f.name;const rd=new FileReader();
+  rd.onload=()=>{set(parseCSV(rd.result));ready();};rd.readAsText(f);});});
+$("sample").addEventListener("click",()=>{
+ // actual sample exports, verified against the reconciliation engine
+ qRows=parseCSV(`quote_id,account,sku,name,quantity,net_unit_price,list_unit_price
+Q-2026-0417,Northwind Trading,ENT-SEAT,Enterprise Seat,120,102.00,120.00
+Q-2026-0417,Northwind Trading,API-PACK,API Capacity Pack,4,450.00,500.00
+Q-2026-0417,Northwind Trading,ONBOARD,Implementation,1,15000.00,18000.00
+Q-2026-0392,Globex Systems,ENT-SEAT,Enterprise Seat,45,114.00,120.00
+Q-2026-0392,Globex Systems,ONBOARD,Implementation,1,5000.00,5000.00
+Q-2026-0455,Initech LLC,ENT-SEAT,Enterprise Seat,30,108.00,120.00
+Q-2026-0455,Initech LLC,API-PACK,API Capacity Pack,2,475.00,500.00`);
+ iRows=parseCSV(`invoice_id,quote_id,account,sku,quantity,unit_price,total,invoice_date
+INV-88201,Q-2026-0417,Northwind Trading,ENT-SEAT,120,102.00,"12,240.00",2026-01-15
+INV-88201,Q-2026-0417,Northwind Trading,API-PACK,4,450.00,"1,800.00",2026-01-15
+INV-88201,Q-2026-0417,Northwind Trading,ONBOARD,1,15000.00,"15,000.00",2026-01-15
+INV-88301,Q-2026-0417,Northwind Trading,ENT-SEAT,120,120.00,"14,400.00",2026-03-15
+INV-88301,Q-2026-0417,Northwind Trading,API-PACK,4,450.00,"1,800.00",2026-03-15
+INV-90112,Q-2026-0392,Globex Systems,ENT-SEAT,45,114.00,"5,130.00",2026-01-20
+INV-90112,Q-2026-0392,Globex Systems,ONBOARD,1,5000.00,"5,000.00",2026-01-20
+INV-90188,Q-2026-0392,Globex Systems,ENT-SEAT,40,114.00,"4,560.00",2026-02-20
+INV-91050,Q-2026-0455,Initech LLC,ENT-SEAT,30,108.00,"3,240.00",2026-01-10
+INV-91050,Q-2026-0455,Initech LLC,API-PACK,2,475.00,"950.00",2026-01-10
+INV-93001,Q-2026-0777,Wayne Enterprises,ENT-SEAT,5,120.00,"600.00",2026-01-05`);
+ $("qname").textContent="quotes_salesforce.csv · 7 lines";
+ $("iname").textContent="invoices_zuora.csv · 11 lines";ready();
+ $("runReal").scrollIntoView({behavior:"smooth",block:"center"});});
+$("runReal").addEventListener("click",()=>{try{
+ const qm=autoMap(qRows,["quote_id","account","sku","quantity","unit_price"]);
+ const im=autoMap(iRows,["invoice_id","quote_id","account","sku","quantity","unit_price","total"]);
+ $("mapinfo").textContent="columns identified — quotes: "+JSON.stringify(qm)+" · invoices: "+JSON.stringify(im);
+ const quotes={};
+ for(const r of qRows){const qid=(r[qm.quote_id]||"").trim();if(!qid)continue;
+  (quotes[qid]=quotes[qid]||{});if(qm.sku)quotes[qid][(r[qm.sku]||"").trim().toUpperCase()]={qty:Math.round(money(r[qm.quantity]||1)),price:money(r[qm.unit_price]||0)};}
+ const out=[];let leak=0;const billed={};
+ for(const r of iRows){const qid=(r[im.quote_id]||"").trim(),sku=(r[im.sku]||"").trim().toUpperCase();
+  const q=quotes[qid],acct=(r[im.account]||qid).trim();
+  const qty=Math.round(money(r[im.quantity]||1)),tot=money(r[im.total]||0);
+  if(!q){out.push({who:acct,why:`invoiced against unknown quote ${qid}`,amt:Math.abs(tot)});leak+=Math.abs(tot);continue;}
+  (billed[qid]=billed[qid]||new Set()).add(sku);
+  const ql=q[sku];if(!ql){out.push({who:acct,why:`${sku} billed but absent from quote ${qid}`,amt:Math.abs(tot)});leak+=Math.abs(tot);continue;}
+  const exp=ql.price*qty,d=tot-exp;
+  if(Math.abs(d)>Math.max(.01,exp*.001)){out.push({who:acct,why:`${sku} billed off the contracted price (${d>0?"over":"under"})`,amt:Math.abs(d)});leak+=Math.abs(d);}
+  else if(qty!==ql.qty){const dq=Math.abs(ql.qty-qty)*ql.price;out.push({who:acct,why:`${sku}: quantity ${qty} against approved ${ql.qty}`,amt:dq});leak+=dq;}}
+ for(const[qid,skus]of Object.entries(billed))for(const sku of Object.keys(quotes[qid]||{}))
+  if(!skus.has(sku)){const ql=quotes[qid][sku],amt=ql.price*ql.qty;
+   out.push({who:qid,why:`${sku} approved but never invoiced`,amt});leak+=amt;}
+ const rows=$("realRows");rows.innerHTML="";$("realSched").style.display="block";
+ out.sort((a,b)=>b.amt-a.amt).slice(0,12).forEach((f,i)=>{const d=document.createElement("div");
+  d.className="li";d.innerHTML=`<div style="display:flex;gap:10px;align-items:baseline"><span class="idx">${String(i+1).padStart(2,"0")}</span><span><span class="acct">${f.who}</span><br><span class="why">${f.why}</span></span></div><span class="amt">$${Math.round(f.amt).toLocaleString()}</span>`;
+  rows.appendChild(d);});
+ const t=$("realTotal");
+ t.textContent=out.length?"$"+Math.round(leak).toLocaleString():"— nil —";
+ t.style.color=out.length?"var(--red)":"var(--grn)";
+ $("runReal").textContent="Examined — "+out.length+" finding"+(out.length===1?"":"s");
+ $("realSched").scrollIntoView({behavior:"smooth",block:"center"});
+}catch(err){$("mapinfo").textContent="⚠ could not read those files: "+err.message+" — check they are comma-separated CSVs with header rows";}});
+</script>
+</body>
+</html>
