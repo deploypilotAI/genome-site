@@ -184,12 +184,12 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 <section class="sec" id="s02" style="background:var(--paper2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)"><div class="wrap reveal">
   <div class="secno">02 · Examination of Your Records</div>
   <h2>Conducted entirely<br>within your browser.<span class="fn">2</span></h2>
-  <p class="lede">Drop a quote export and an invoice export. Columns identify themselves; the reconciliation runs on your device. Nothing uploads. Nothing persists. Refresh, and it never happened.</p>
+  <p class="lede">Drop two CSV exports — quotes and invoices, in any order. We'll figure out which is which. The reconciliation runs on your device. Nothing uploads. Nothing persists. Refresh, and it never happened.</p>
   <div class="updrop">
     <label><input type="file" accept=".csv" id="qfile" hidden>
-      <div class="fn2" id="qname">quotes export · .csv</div><div class="cta2">Choose quotes file</div></label>
+      <div class="fn2" id="qname">CSV file 1</div><div class="cta2">Choose a CSV</div></label>
     <label><input type="file" accept=".csv" id="ifile" hidden>
-      <div class="fn2" id="iname">invoices export · .csv</div><div class="cta2">Choose invoices file</div></label>
+      <div class="fn2" id="iname">CSV file 2</div><div class="cta2">Choose a CSV</div></label>
   </div>
   <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
     <button class="btn red" id="runReal" disabled>Examine my records</button>
@@ -314,13 +314,13 @@ $("run").addEventListener("click",()=>{if(ran)return;ran=true;
  setTimeout(()=>{$("stamp").classList.add("show");
   $("run").textContent="Examination complete — every line traceable";$("run").disabled=true;},reduce?0:1700);});
 // ── real in-browser examination ──
-const SYN={quote_id:["quote id","quote number","quote no","proposal id","created from","quote"],
- invoice_id:["invoice id","invoice number","document number","id","invoice no"],
- account:["account","account name","customer","company","client"],
- sku:["sku","product code","item","product","charge name","line item sku"],
- quantity:["quantity","qty","units","seats"],
- unit_price:["unit price","sales price","net unit price","rate","price","unit amount"],
- total:["total","amount","line total","amount due","charge amount"]};
+const SYN={quote_id:["quote id","quote number","quote no","proposal id","created from","quote","opportunity id","deal id","quote ref","contract id","order number"],
+ invoice_id:["invoice id","invoice number","document number","id","invoice no","billing id","transaction id","inv number","inv no"],
+ account:["account","account name","customer","company","client","customer name","billing account","org name","company name","sold to"],
+ sku:["sku","product code","item","product","charge name","line item sku","item code","part number","product name","product id","material","catalog item","line item"],
+ quantity:["quantity","qty","units","seats","count","licenses","users","no of seats","num seats"],
+ unit_price:["unit price","sales price","net unit price","rate","price","unit amount","contracted price","agreed price","negotiated price","price each","amt per unit"],
+ total:["total","amount","line total","amount due","charge amount","extended amount","line amount","net amount","invoice amount","subtotal","charge total"]};
 const normH=h=>h.toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
 const money=s=>{s=String(s).trim();const neg=/^\(.*\)$/.test(s);s=s.replace(/[^\d.,-]/g,"");
  if(s.includes(",")&&s.includes(".")){s=s.lastIndexOf(",")>s.lastIndexOf(".")?s.replace(/\./g,"").replace(",","."):s.replace(/,/g,"");}
@@ -334,20 +334,38 @@ function parseCSV(text){const rows=[];let row=[],cell="",q=false;
   else cell+=c;}
  if(cell||row.length){row.push(cell);rows.push(row);}
  const[h,...data]=rows;return data.filter(r=>r.length>1).map(r=>Object.fromEntries(h.map((k,i)=>[k,r[i]??""])));}
-function autoMap(rows,fields){const headers=Object.keys(rows[0]||{});const map={};
+function autoMap(rows,fields){const headers=Object.keys(rows[0]||{});const map={},how={};
  for(const f of fields){let best=null,bs=0;
   for(const h of headers){const n=normH(h);let s=0;
    if(SYN[f].includes(n))s=.95;else if(SYN[f].some(x=>x.length>3&&(n.includes(x)||x.includes(n))))s=.7;
    if(s>bs&&!Object.values(map).includes(h)){bs=s;best=h;}}
-  if(best&&bs>=.7)map[f]=best;}
- return map;}
-let qRows=null,iRows=null;
+  if(best&&bs>=.7){map[f]=best;how[f]="matched";}}
+ // value sniffing for still-unmapped required fields (never overrides a header hit)
+ const used=()=>Object.values(map),colVals=h=>rows.map(r=>String(r[h]??"").trim()).filter(v=>v!=="");
+ const frac=(vs,p)=>vs.length?vs.filter(p).length/vs.length:0,distinct=vs=>new Set(vs).size/(vs.length||1);
+ const moneyish=v=>/\$/.test(v)||(/\d/.test(v)&&/[.,]/.test(v)),intish=v=>/^\d{1,4}$/.test(v)&&+v>=1&&+v<=9999;
+ const idish=v=>/^(q|quo|inv)[-_]/i.test(v)||(/^[a-z0-9][a-z0-9._\-]{3,}$/i.test(v)&&/\d/.test(v)&&/[a-z]/i.test(v));
+ const cols=headers.filter(h=>!used().includes(h)).map(h=>({h,vs:colVals(h)})).filter(c=>c.vs.length);
+ const claim=(f,pred)=>{if(map[f])return;const c=cols.find(c=>!used().includes(c.h)&&pred(c));if(c){map[f]=c.h;how[f]="inferred";}};
+ for(const f of fields){if(map[f])continue;
+  if(f==="unit_price"||f==="total")claim(f,c=>frac(c.vs,moneyish)>.8&&distinct(c.vs)>.5);
+  else if(f==="quantity")claim(f,c=>frac(c.vs,intish)>.8);
+  else if(f==="quote_id"||f==="invoice_id")claim(f,c=>frac(c.vs,idish)>.8);}
+ return{map,how};}
+let qRows=null,iRows=null,qFile="",iFile="";
 const ready=()=>{$("runReal").disabled=!(qRows&&iRows);};
-[["qfile","qname",r=>{qRows=r;}],["ifile","iname",r=>{iRows=r;}]].forEach(([fid,nid,set])=>{
+[["qfile","qname",(r,n)=>{qRows=r;qFile=n;}],["ifile","iname",(r,n)=>{iRows=r;iFile=n;}]].forEach(([fid,nid,set])=>{
  $(fid).addEventListener("change",()=>{const f=$(fid).files[0];if(!f)return;
   $(nid).textContent=f.name;const rd=new FileReader();
-  rd.onload=()=>{set(parseCSV(rd.result));ready();};rd.readAsText(f);});});
+  rd.onload=()=>{set(parseCSV(rd.result),f.name);ready();};rd.readAsText(f);});});
+// ── which file is quotes, which invoices — by normalized header signals ──
+const QSIG=["quote id","quote number","quote no","proposal id","sales price","list price","net unit price","discount"];
+const ISIG=["invoice id","invoice number","invoice date","amount due","charge amount","billing date"];
+function detectKind(rows){const hs=Object.keys(rows[0]||{}).map(normH);
+ const hit=sig=>sig.reduce((n,s)=>n+(hs.some(h=>h===s||h.includes(s))?1:0),0);
+ return{q:hit(QSIG),i:hit(ISIG)};}
 $("sample").addEventListener("click",()=>{
+ qFile="quotes_salesforce.csv";iFile="invoices_zuora.csv";
  // actual sample exports, verified against the reconciliation engine
  qRows=parseCSV(`quote_id,account,sku,name,quantity,net_unit_price,list_unit_price
 Q-2026-0417,Northwind Trading,ENT-SEAT,Enterprise Seat,120,102.00,120.00
@@ -373,14 +391,29 @@ INV-93001,Q-2026-0777,Wayne Enterprises,ENT-SEAT,5,120.00,"600.00",2026-01-05`);
  $("iname").textContent="invoices_zuora.csv · 11 lines";ready();
  $("runReal").scrollIntoView({behavior:"smooth",block:"center"});});
 $("runReal").addEventListener("click",()=>{try{
- const qm=autoMap(qRows,["quote_id","account","sku","quantity","unit_price"]);
- const im=autoMap(iRows,["invoice_id","quote_id","account","sku","quantity","unit_price","total"]);
- $("mapinfo").textContent="columns identified — quotes: "+JSON.stringify(qm)+" · invoices: "+JSON.stringify(im);
- const quotes={};
- for(const r of qRows){const qid=(r[qm.quote_id]||"").trim();if(!qid)continue;
+ // ── detect orientation: which uploaded file is quotes, which invoices ──
+ const ka=detectKind(qRows),kb=detectKind(iRows);
+ if(ka.q>ka.i&&kb.q>kb.i){$("mapinfo").innerHTML="⚠ Both files look like quotes — I need one of each.";return;}
+ if(ka.i>ka.q&&kb.i>kb.q){$("mapinfo").innerHTML="⚠ Both files look like invoices — I need one of each.";return;}
+ let Q,I,qn,inm;
+ if((ka.q-ka.i)>=(kb.q-kb.i)){Q=qRows;I=iRows;qn=qFile;inm=iFile;}
+ else{Q=iRows;I=qRows;qn=iFile;inm=qFile;}
+ // ── 100-row cap (independent per file) — examine first 100, upsell the rest ──
+ const qN0=Q.length,iN0=I.length,trunc=qN0>100||iN0>100;
+ Q=Q.slice(0,100);I=I.slice(0,100);
+ // ── auto-map with per-field confidence ──
+ const {map:qm,how:qh}=autoMap(Q,["quote_id","account","sku","quantity","unit_price"]);
+ const {map:im,how:ih}=autoMap(I,["invoice_id","quote_id","account","sku","quantity","unit_price","total"]);
+ const fmt=(m,h)=>Object.keys(m).map(f=>`<span class="mono">${f}→${m[f]}</span> ${h[f]==="matched"?"✓ matched":"? inferred from values"}`).join(" · ")||"<i>no columns identified</i>";
+ const note=trunc?`<div style="color:var(--red);margin-bottom:8px">Examining the first 100 lines of ${(qN0+iN0).toLocaleString()} total. The full engagement examines every line, every month — with credits, amendments, ramps, and usage rates.</div>`:"";
+ $("mapinfo").innerHTML=note+`<div>Detected: <b>${qn||"file A"}</b> as quotes, <b>${inm||"file B"}</b> as invoices</div><div style="margin-top:4px">quotes — ${fmt(qm,qh)}</div><div>invoices — ${fmt(im,ih)}</div>`;
+ // ── build quote lookup + per-quote account name (Change A) ──
+ const quotes={},qAcct={};
+ for(const r of Q){const qid=(r[qm.quote_id]||"").trim();if(!qid)continue;
+  if(qm.account&&!qAcct[qid]){const a=(r[qm.account]||"").trim();if(a)qAcct[qid]=a;}
   (quotes[qid]=quotes[qid]||{});if(qm.sku)quotes[qid][(r[qm.sku]||"").trim().toUpperCase()]={qty:Math.round(money(r[qm.quantity]||1)),price:money(r[qm.unit_price]||0)};}
  const out=[];let leak=0;const billed={};
- for(const r of iRows){const qid=(r[im.quote_id]||"").trim(),sku=(r[im.sku]||"").trim().toUpperCase();
+ for(const r of I){const qid=(r[im.quote_id]||"").trim(),sku=(r[im.sku]||"").trim().toUpperCase();
   const q=quotes[qid],acct=(r[im.account]||qid).trim();
   const qty=Math.round(money(r[im.quantity]||1)),tot=money(r[im.total]||0);
   if(!q){out.push({who:acct,why:`invoiced against unknown quote ${qid}`,amt:Math.abs(tot)});leak+=Math.abs(tot);continue;}
@@ -391,7 +424,7 @@ $("runReal").addEventListener("click",()=>{try{
   else if(qty!==ql.qty){const dq=Math.abs(ql.qty-qty)*ql.price;out.push({who:acct,why:`${sku}: quantity ${qty} against approved ${ql.qty}`,amt:dq});leak+=dq;}}
  for(const[qid,skus]of Object.entries(billed))for(const sku of Object.keys(quotes[qid]||{}))
   if(!skus.has(sku)){const ql=quotes[qid][sku],amt=ql.price*ql.qty;
-   out.push({who:qid,why:`${sku} approved but never invoiced`,amt});leak+=amt;}
+   out.push({who:qAcct[qid]||qid,why:`${sku} approved but never invoiced`,amt});leak+=amt;}
  const rows=$("realRows");rows.innerHTML="";$("realSched").style.display="block";
  out.sort((a,b)=>b.amt-a.amt).slice(0,12).forEach((f,i)=>{const d=document.createElement("div");
   d.className="li";d.innerHTML=`<div style="display:flex;gap:10px;align-items:baseline"><span class="idx">${String(i+1).padStart(2,"0")}</span><span><span class="acct">${f.who}</span><br><span class="why">${f.why}</span></span></div><span class="amt">$${Math.round(f.amt).toLocaleString()}</span>`;
