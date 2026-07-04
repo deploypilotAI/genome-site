@@ -228,7 +228,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
       <div class="tdesc">two exports in, findings out — within 48 hours</div>
       <ul><li>Anonymized quote + invoice exports</li><li>Dollarized schedule of findings</li><li>Every line traceable to its quote</li><li><b>No access. No install. No call.</b></li><li>One pilot per company</li></ul>
       <div class="price"><hr class="double"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="p">$0</span><span class="per">one engagement</span></div></div>
-      <a class="btn primary" href="mailto:dinesh5c9@gmail.com?subject=Pilot%20examination%20request&body=Hi%20DC%2C%0A%0AWe%27d%20like%20the%20free%20pilot%20examination.%0A%0AQuotes%20live%20in%3A%20%5BSalesforce%20%2F%20CPQ%20%2F%20other%5D%0ABilling%20lives%20in%3A%20%5BZuora%20%2F%20Stripe%20%2F%20NetSuite%20%2F%20other%5D%0ABilling%20cadence%3A%20%5Bmonthly%20%2F%20annual%20%2F%20mixed%5D%0A%0AWe%27ll%20attach%20two%20anonymized%20exports%20%28quotes%20%2B%20invoices%29.%0A%0AThanks%2C">Submit exports →</a>
+      <a class="btn primary" href="#s02">Submit exports →</a>
     </div>
     <div class="term hot">
       <div class="tname">Continuous Examination</div>
@@ -274,7 +274,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   <div class="secno">In Closing</div>
   <h2>Find out what is leaking,<br>before your auditors do.</h2>
   <p class="lede" style="margin-top:14px">Two exports. Forty-eight hours. One figure your CFO will repeat in the next staff meeting.</p>
-  <div style="margin-top:30px"><a class="btn primary" href="mailto:dinesh5c9@gmail.com?subject=Pilot%20examination%20request&body=Hi%20DC%2C%0A%0AWe%27d%20like%20the%20free%20pilot%20examination.%0A%0AQuotes%20live%20in%3A%20%5BSalesforce%20%2F%20CPQ%20%2F%20other%5D%0ABilling%20lives%20in%3A%20%5BZuora%20%2F%20Stripe%20%2F%20NetSuite%20%2F%20other%5D%0ABilling%20cadence%3A%20%5Bmonthly%20%2F%20annual%20%2F%20mixed%5D%0A%0AWe%27ll%20attach%20two%20anonymized%20exports%20%28quotes%20%2B%20invoices%29.%0A%0AThanks%2C">Request the pilot examination</a></div>
+  <div style="margin-top:30px"><a class="btn primary" href="#s02">Request the pilot examination</a></div>
   <div class="sig">Respectfully submitted,<br><b>Genome</b> — Independent Revenue Examiners
     <div class="mono">deterministic core · agentic shell · est. 2026</div></div>
 </div></section>
@@ -435,6 +435,19 @@ $("runReal").addEventListener("click",()=>{try{
  $("runReal").textContent="Examined — "+out.length+" finding"+(out.length===1?"":"s");
  $("realSched").scrollIntoView({behavior:"smooth",block:"center"});
 }catch(err){$("mapinfo").textContent="⚠ could not read those files: "+err.message+" — check they are comma-separated CSVs with header rows";}});
+// mailto CTAs: a visitor with no default mail app sees nothing happen. Let the
+// mailto fire as normal, but always also copy the address and surface it, so the
+// engagement CTAs never appear to "do nothing".
+document.querySelectorAll('a[href^="mailto:"]').forEach(a=>a.addEventListener("click",()=>{
+ const email=a.getAttribute("href").slice(7).split("?")[0];
+ try{navigator.clipboard&&navigator.clipboard.writeText(email);}catch(e){}
+ let t=$("mailtoast");
+ if(!t){t=document.createElement("div");t.id="mailtoast";
+  t.style.cssText="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-family:'IBM Plex Mono',monospace;font-size:12px;padding:11px 16px;border-radius:3px;z-index:99;box-shadow:0 6px 18px rgba(0,0,0,.22);opacity:0;transition:opacity .2s;max-width:90vw;text-align:center";
+  document.body.appendChild(t);}
+ t.textContent="Opening your mail app… no mail app? Address copied — "+email;
+ t.style.opacity="1";clearTimeout(t._h);t._h=setTimeout(()=>t.style.opacity="0",4200);
+}));
 </script>
 </body>
 </html>
