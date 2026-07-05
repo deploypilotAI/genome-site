@@ -184,13 +184,12 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 <section class="sec" id="s02" style="background:var(--paper2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)"><div class="wrap reveal">
   <div class="secno">02 · Examination of Your Records</div>
   <h2>Conducted entirely<br>within your browser.<span class="fn">2</span></h2>
-  <p class="lede">Drop two CSV exports — quotes and invoices, in any order. We'll figure out which is which. The reconciliation runs on your device. Nothing uploads. Nothing persists. Refresh, and it never happened.</p>
+  <p class="lede">Drop your CSV exports — as many as you like, in any order. Three Salesforce pulls and two billing exports is fine; each file is identified as quotes or invoices by its own columns. The reconciliation runs on your device. Nothing uploads. Nothing persists. Refresh, and it never happened.</p>
   <div class="updrop">
-    <label><input type="file" accept=".csv" id="qfile" hidden>
-      <div class="fn2" id="qname">CSV file 1</div><div class="cta2">Choose a CSV</div></label>
-    <label><input type="file" accept=".csv" id="ifile" hidden>
-      <div class="fn2" id="iname">CSV file 2</div><div class="cta2">Choose a CSV</div></label>
+    <label style="grid-column:1/-1"><input type="file" accept=".csv" id="files" hidden multiple>
+      <div class="fn2" id="fcount">CSV exports — any number, any mix</div><div class="cta2">Choose CSV files</div></label>
   </div>
+  <div class="mapnote" id="filechips"></div>
   <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
     <button class="btn red" id="runReal" disabled>Examine my records</button>
     <button class="btn" id="sample">Use specimen data</button>
@@ -238,6 +237,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
         <li>Up to <b>$25M</b> — <b>$2,000/mo</b></li>
         <li>Up to <b>$100M</b> — <b>$4,000/mo</b></li>
         <li>4 connected systems included · +$250/mo each add’l</li>
+        <li>Connect <b>any</b> system by endpoint — CRM, billing, or homegrown</li>
         <li>Annual prepay: <b>two months free</b></li>
       </ul>
       <div class="price"><hr class="double"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="p">from $750</span><span class="per">per month · unlimited users</span></div></div>
@@ -264,7 +264,8 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   <div style="margin-top:24px">
     <details class="note"><summary><span class="no">NOTE 1</span><span class="q">Is AI making pricing or approval decisions?</span></summary><p>No — structurally. Models parse language, suggest mappings, and draft prose. Prices, verdicts, and findings come from deterministic, versioned engines. No model output contains a field through which a number can reach the money path.</p></details>
     <details class="note"><summary><span class="no">NOTE 2</span><span class="q">What is your source of truth when my systems disagree?</span></summary><p>Neither system. Your CRM owns quotes; your billing owns invoices. The disagreement between them — quantified, per account, with evidence — is the product. We are an instrument of verification, not a fourth system of record.</p></details>
-    <details class="note"><summary><span class="no">NOTE 3</span><span class="q">Sales owns Salesforce; Finance owns billing. Problem?</span></summary><p>The normal case, and the pilot is designed for it: each team exports one report from its own system. No shared access, no security review, no cross-team negotiation. Read-only connections come later, if the first schedule of findings justifies them.</p></details>
+    <details class="note"><summary><span class="no">NOTE 3</span><span class="q">Sales owns Salesforce; Finance owns billing. Problem?</span></summary><p>The normal case, and the pilot is designed for it: each team exports one report from its own system. No shared access, no security review, no cross-team negotiation. Read-only connections come after — once the first schedule of findings justifies them.</p></details>
+    <details class="note"><summary><span class="no">NOTE 6</span><span class="q">Can you connect directly to our systems?</span></summary><p>Yes — any system with an HTTP API, not just the household names. A source is registered as configuration: endpoint, auth (API key, bearer, basic, or OAuth2), pagination. Its records flow through the same field-mapping examination as file uploads, and you preview exactly how its fields mapped before any reconciliation runs. Credentials stay in your environment, referenced by name; the examiner never stores, returns, or logs a secret. Anything ambiguous is refused with the reason — never guessed.</p></details>
     <details class="note"><summary><span class="no">NOTE 4</span><span class="q">What about legitimate exceptions?</span></summary><p>One disposition marks a finding as expected; suppression is scoped to that exact account, item, and issue class — never blanket — and the suppression itself is recorded in the evidence chain. Fixed issues that recur re-flag deliberately.</p></details>
     <details class="note"><summary><span class="no">NOTE 5</span><span class="q">Can our auditors reproduce your figures?</span></summary><p>Yes. Every figure is stamped with the pricing and policy versions in force when it was computed, both immutably registered. Re-derivation is one operation and agrees to the cent.</p></details>
   </div>
@@ -352,30 +353,66 @@ function autoMap(rows,fields){const headers=Object.keys(rows[0]||{});const map={
   else if(f==="quantity")claim(f,c=>frac(c.vs,intish)>.8);
   else if(f==="quote_id"||f==="invoice_id")claim(f,c=>frac(c.vs,idish)>.8);}
  return{map,how};}
-let qRows=null,iRows=null,qFile="",iFile="";
-const ready=()=>{$("runReal").disabled=!(qRows&&iRows);};
-[["qfile","qname",(r,n)=>{qRows=r;qFile=n;}],["ifile","iname",(r,n)=>{iRows=r;iFile=n;}]].forEach(([fid,nid,set])=>{
- $(fid).addEventListener("change",()=>{const f=$(fid).files[0];if(!f)return;
-  $(nid).textContent=f.name;const rd=new FileReader();
-  rd.onload=()=>{set(parseCSV(rd.result),f.name);ready();};rd.readAsText(f);});});
-// ── which file is quotes, which invoices — by normalized header signals ──
-const QSIG=["quote id","quote number","quote no","proposal id","sales price","list price","net unit price","discount"];
-const ISIG=["invoice id","invoice number","invoice date","amount due","charge amount","billing date"];
+// ── per-file classification — mirrors the engagement engine's rule:
+//    a kind is eligible only if every required column maps; ties are broken
+//    by distinctive fields; no clear winner is a REFUSAL, never a guess ──
+const QREQ=["quote_id","account","sku","quantity","unit_price"];
+const IREQ=["invoice_id","quote_id","account","sku","quantity","unit_price","total"];
+const QSIG=["quote id","quote number","quote no","proposal id","sales price","list price","net unit price","discount","term"];
+const ISIG=["invoice id","invoice number","invoice date","amount due","charge amount","billing date","billing period"];
 function detectKind(rows){const hs=Object.keys(rows[0]||{}).map(normH);
  const hit=sig=>sig.reduce((n,s)=>n+(hs.some(h=>h===s||h.includes(s))?1:0),0);
  return{q:hit(QSIG),i:hit(ISIG)};}
+function classifyFile(rows){
+ if(!rows.length)return{kind:"unknown",reason:"empty file"};
+ const{map:qm,how:qh}=autoMap(rows,QREQ),{map:im,how:ih}=autoMap(rows,IREQ);
+ const qok=QREQ.every(f=>qm[f]),iok=IREQ.every(f=>im[f]);
+ if(!qok&&!iok)return{kind:"unknown",reason:"columns don't confidently match either export"};
+ if(qok&&!iok)return{kind:"quote",map:qm,how:qh,reason:"quote-required columns all mapped"};
+ if(iok&&!qok)return{kind:"invoice",map:im,how:ih,reason:"invoice-required columns all mapped"};
+ const s=detectKind(rows);
+ if(s.q>s.i)return{kind:"quote",map:qm,how:qh,reason:"quote-only fields dominate"};
+ if(s.i>s.q)return{kind:"invoice",map:im,how:ih,reason:"invoice-only fields dominate"};
+ return{kind:"ambiguous",reason:"maps equally well as either — we refuse rather than guess"};}
+let uploads=[]; // {name, rows, kind, map, how, reason}
+function renderChips(){
+ const chip=u=>{const c=u.kind==="quote"?"var(--grn)":u.kind==="invoice"?"var(--ink)":"var(--red)";
+  const mark=u.kind==="quote"||u.kind==="invoice"?"✓":"⚠";
+  return`<div><span style="color:${c}">${mark} <b>${u.name}</b> → ${u.kind}</span> — ${u.reason}</div>`;};
+ $("filechips").innerHTML=uploads.map(chip).join("");
+ const nq=uploads.filter(u=>u.kind==="quote").length,ni=uploads.filter(u=>u.kind==="invoice").length;
+ const bad=uploads.filter(u=>u.kind==="ambiguous"||u.kind==="unknown");
+ $("fcount").textContent=uploads.length?`${uploads.length} file${uploads.length>1?"s":""} · ${nq} quotes · ${ni} invoices`:"CSV exports — any number, any mix";
+ let msg="";
+ if(uploads.length){
+  if(bad.length)msg=`⚠ ${bad.map(u=>u.name).join(", ")} could not be classified — nothing will be examined until every file is identified (we refuse rather than guess)`;
+  else if(!nq)msg="⚠ no quotes export identified among the files";
+  else if(!ni)msg="⚠ no invoice export identified among the files";}
+ $("mapinfo").innerHTML=msg;
+ $("runReal").disabled=!(nq&&ni&&!bad.length);
+ $("runReal").textContent="Examine my records";}
+function addFiles(list){Promise.all([...list].map(f=>new Promise(res=>{
+  const rd=new FileReader();rd.onload=()=>{let u;
+   try{const rows=parseCSV(rd.result);u={name:f.name,rows,...classifyFile(rows)};}
+   catch(e){u={name:f.name,rows:[],kind:"unknown",reason:"could not parse: "+e.message};}
+   res(u);};rd.readAsText(f);})))
+ .then(us=>{uploads=uploads.concat(us);renderChips();});}
+$("files").addEventListener("change",()=>{if($("files").files.length){addFiles($("files").files);$("files").value="";}});
 $("sample").addEventListener("click",()=>{
- qFile="quotes_salesforce.csv";iFile="invoices_zuora.csv";
- // actual sample exports, verified against the reconciliation engine
- qRows=parseCSV(`quote_id,account,sku,name,quantity,net_unit_price,list_unit_price
+ // three unlabeled exports: TWO Salesforce quote pulls (overlapping — the
+ // duplicate quote keeps its first occurrence) + one Zuora invoice export
+ const sf1=parseCSV(`quote_id,account,sku,name,quantity,net_unit_price,list_unit_price
 Q-2026-0417,Northwind Trading,ENT-SEAT,Enterprise Seat,120,102.00,120.00
 Q-2026-0417,Northwind Trading,API-PACK,API Capacity Pack,4,450.00,500.00
 Q-2026-0417,Northwind Trading,ONBOARD,Implementation,1,15000.00,18000.00
 Q-2026-0392,Globex Systems,ENT-SEAT,Enterprise Seat,45,114.00,120.00
-Q-2026-0392,Globex Systems,ONBOARD,Implementation,1,5000.00,5000.00
+Q-2026-0392,Globex Systems,ONBOARD,Implementation,1,5000.00,5000.00`);
+ const sf2=parseCSV(`quote_id,account,sku,name,quantity,net_unit_price,list_unit_price
+Q-2026-0417,Northwind Trading,ENT-SEAT,Enterprise Seat,120,102.00,120.00
 Q-2026-0455,Initech LLC,ENT-SEAT,Enterprise Seat,30,108.00,120.00
-Q-2026-0455,Initech LLC,API-PACK,API Capacity Pack,2,475.00,500.00`);
- iRows=parseCSV(`invoice_id,quote_id,account,sku,quantity,unit_price,total,invoice_date
+Q-2026-0455,Initech LLC,API-PACK,API Capacity Pack,2,475.00,500.00
+Q-2026-0501,Stark Industries,ENT-SEAT,Enterprise Seat,10,110.00,120.00`);
+ const zu=parseCSV(`invoice_id,quote_id,account,sku,quantity,unit_price,total,invoice_date
 INV-88201,Q-2026-0417,Northwind Trading,ENT-SEAT,120,102.00,"12,240.00",2026-01-15
 INV-88201,Q-2026-0417,Northwind Trading,API-PACK,4,450.00,"1,800.00",2026-01-15
 INV-88201,Q-2026-0417,Northwind Trading,ONBOARD,1,15000.00,"15,000.00",2026-01-15
@@ -387,44 +424,46 @@ INV-90188,Q-2026-0392,Globex Systems,ENT-SEAT,40,114.00,"4,560.00",2026-02-20
 INV-91050,Q-2026-0455,Initech LLC,ENT-SEAT,30,108.00,"3,240.00",2026-01-10
 INV-91050,Q-2026-0455,Initech LLC,API-PACK,2,475.00,"950.00",2026-01-10
 INV-93001,Q-2026-0777,Wayne Enterprises,ENT-SEAT,5,120.00,"600.00",2026-01-05`);
- $("qname").textContent="quotes_salesforce.csv · 7 lines";
- $("iname").textContent="invoices_zuora.csv · 11 lines";ready();
+ uploads=[{name:"sf_quotes_pull_1.csv",rows:sf1,...classifyFile(sf1)},
+  {name:"sf_quotes_pull_2.csv",rows:sf2,...classifyFile(sf2)},
+  {name:"invoices_zuora.csv",rows:zu,...classifyFile(zu)}];
+ renderChips();
  $("runReal").scrollIntoView({behavior:"smooth",block:"center"});});
 $("runReal").addEventListener("click",()=>{try{
- // ── detect orientation: which uploaded file is quotes, which invoices ──
- const ka=detectKind(qRows),kb=detectKind(iRows);
- if(ka.q>ka.i&&kb.q>kb.i){$("mapinfo").innerHTML="⚠ Both files look like quotes — I need one of each.";return;}
- if(ka.i>ka.q&&kb.i>kb.q){$("mapinfo").innerHTML="⚠ Both files look like invoices — I need one of each.";return;}
- let Q,I,qn,inm;
- if((ka.q-ka.i)>=(kb.q-kb.i)){Q=qRows;I=iRows;qn=qFile;inm=iFile;}
- else{Q=iRows;I=qRows;qn=iFile;inm=qFile;}
- // ── 100-row cap (independent per file) — examine first 100, upsell the rest ──
- const qN0=Q.length,iN0=I.length,trunc=qN0>100||iN0>100;
- Q=Q.slice(0,100);I=I.slice(0,100);
- // ── auto-map with per-field confidence ──
- const {map:qm,how:qh}=autoMap(Q,["quote_id","account","sku","quantity","unit_price"]);
- const {map:im,how:ih}=autoMap(I,["invoice_id","quote_id","account","sku","quantity","unit_price","total"]);
- const fmt=(m,h)=>Object.keys(m).map(f=>`<span class="mono">${f}→${m[f]}</span> ${h[f]==="matched"?"✓ matched":"? inferred from values"}`).join(" · ")||"<i>no columns identified</i>";
- const note=trunc?`<div style="color:var(--red);margin-bottom:8px">Examining the first 100 lines of ${(qN0+iN0).toLocaleString()} total. The full engagement examines every line, every month — with credits, amendments, ramps, and usage rates.</div>`:"";
- $("mapinfo").innerHTML=note+`<div>Detected: <b>${qn||"file A"}</b> as quotes, <b>${inm||"file B"}</b> as invoices</div><div style="margin-top:4px">quotes — ${fmt(qm,qh)}</div><div>invoices — ${fmt(im,ih)}</div>`;
- // ── build quote lookup + per-quote account name (Change A) ──
+ const qs=uploads.filter(u=>u.kind==="quote"),is=uploads.filter(u=>u.kind==="invoice");
+ // ── 100-row cap per file — examine the first 100, upsell the rest ──
+ let total=0,capped=0;
+ const cap=u=>{total+=u.rows.length;if(u.rows.length>100)capped++;return u.rows.slice(0,100);};
+ // ── merge quote pulls: duplicate quote+item keeps its FIRST occurrence ──
  const quotes={},qAcct={};
- for(const r of Q){const qid=(r[qm.quote_id]||"").trim();if(!qid)continue;
-  if(qm.account&&!qAcct[qid]){const a=(r[qm.account]||"").trim();if(a)qAcct[qid]=a;}
-  (quotes[qid]=quotes[qid]||{});if(qm.sku)quotes[qid][(r[qm.sku]||"").trim().toUpperCase()]={qty:Math.round(money(r[qm.quantity]||1)),price:money(r[qm.unit_price]||0)};}
+ for(const u of qs){const m=u.map;
+  for(const r of cap(u)){const qid=(r[m.quote_id]||"").trim();if(!qid)continue;
+   if(!qAcct[qid]){const a=(r[m.account]||"").trim();if(a)qAcct[qid]=a;}
+   quotes[qid]=quotes[qid]||{};const sku=(r[m.sku]||"").trim().toUpperCase();
+   if(sku&&!quotes[qid][sku])quotes[qid][sku]={qty:Math.round(money(r[m.quantity]||1)),price:money(r[m.unit_price]||0)};}}
+ // ── normalize every invoice line from every billing export ──
+ const lines=[];
+ for(const u of is){const m=u.map;
+  for(const r of cap(u))lines.push({qid:(r[m.quote_id]||"").trim(),
+   sku:(r[m.sku]||"").trim().toUpperCase(),acct:(r[m.account]||"").trim(),
+   qty:Math.round(money(r[m.quantity]||1)),tot:money(r[m.total]||0)});}
+ const fmt=u=>`<div>${u.name} — ${Object.keys(u.map).map(f=>`<span class="mono">${f}→${u.map[f]}</span> ${u.how[f]==="matched"?"✓":"?"}`).join(" · ")}</div>`;
+ const note=capped?`<div style="color:var(--red);margin-bottom:8px">Examining the first 100 lines per file of ${total.toLocaleString()} total. The full engagement examines every line, every month — with credits, amendments, ramps, and usage rates.</div>`:"";
+ $("mapinfo").innerHTML=note+qs.concat(is).map(fmt).join("");
+ // ── reconcile ──
  const out=[];let leak=0;const billed={};
- for(const r of I){const qid=(r[im.quote_id]||"").trim(),sku=(r[im.sku]||"").trim().toUpperCase();
-  const q=quotes[qid],acct=(r[im.account]||qid).trim();
-  const qty=Math.round(money(r[im.quantity]||1)),tot=money(r[im.total]||0);
-  if(!q){out.push({who:acct,why:`invoiced against unknown quote ${qid}`,amt:Math.abs(tot)});leak+=Math.abs(tot);continue;}
-  (billed[qid]=billed[qid]||new Set()).add(sku);
-  const ql=q[sku];if(!ql){out.push({who:acct,why:`${sku} billed but absent from quote ${qid}`,amt:Math.abs(tot)});leak+=Math.abs(tot);continue;}
-  const exp=ql.price*qty,d=tot-exp;
-  if(Math.abs(d)>Math.max(.01,exp*.001)){out.push({who:acct,why:`${sku} billed off the contracted price (${d>0?"over":"under"})`,amt:Math.abs(d)});leak+=Math.abs(d);}
-  else if(qty!==ql.qty){const dq=Math.abs(ql.qty-qty)*ql.price;out.push({who:acct,why:`${sku}: quantity ${qty} against approved ${ql.qty}`,amt:dq});leak+=dq;}}
- for(const[qid,skus]of Object.entries(billed))for(const sku of Object.keys(quotes[qid]||{}))
-  if(!skus.has(sku)){const ql=quotes[qid][sku],amt=ql.price*ql.qty;
-   out.push({who:qAcct[qid]||qid,why:`${sku} approved but never invoiced`,amt});leak+=amt;}
+ for(const L of lines){const q=quotes[L.qid],acct=L.acct||L.qid;
+  if(!q){out.push({who:acct,why:`invoiced against unknown quote ${L.qid}`,amt:Math.abs(L.tot)});leak+=Math.abs(L.tot);continue;}
+  (billed[L.qid]=billed[L.qid]||new Set()).add(L.sku);
+  const ql=q[L.sku];if(!ql){out.push({who:acct,why:`${L.sku} billed but absent from quote ${L.qid}`,amt:Math.abs(L.tot)});leak+=Math.abs(L.tot);continue;}
+  const exp=ql.price*L.qty,d=L.tot-exp;
+  if(Math.abs(d)>Math.max(.01,exp*.001)){out.push({who:acct,why:`${L.sku} billed off the contracted price (${d>0?"over":"under"})`,amt:Math.abs(d)});leak+=Math.abs(d);}
+  else if(L.qty!==ql.qty){const dq=Math.abs(ql.qty-L.qty)*ql.price;out.push({who:acct,why:`${L.sku}: quantity ${L.qty} against approved ${ql.qty}`,amt:dq});leak+=dq;}}
+ // ── approved but never invoiced — including quotes with NO invoices at all ──
+ for(const qid of Object.keys(quotes)){const skus=billed[qid]||new Set();
+  for(const sku of Object.keys(quotes[qid]))if(!skus.has(sku)){
+   const ql=quotes[qid][sku],amt=ql.price*ql.qty;
+   out.push({who:qAcct[qid]||qid,why:`${sku} approved but never invoiced`,amt});leak+=amt;}}
  const rows=$("realRows");rows.innerHTML="";$("realSched").style.display="block";
  out.sort((a,b)=>b.amt-a.amt).slice(0,12).forEach((f,i)=>{const d=document.createElement("div");
   d.className="li";d.innerHTML=`<div style="display:flex;gap:10px;align-items:baseline"><span class="idx">${String(i+1).padStart(2,"0")}</span><span><span class="acct">${f.who}</span><br><span class="why">${f.why}</span></span></div><span class="amt">$${Math.round(f.amt).toLocaleString()}</span>`;

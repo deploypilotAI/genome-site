@@ -34,7 +34,12 @@ After editing, commit and push to GitHub — Cloudflare redeploys automatically.
 
 The site runs two reconciliation demos:
 1. **Specimen flow** — hardcoded sample data, tap "Run the specimen examination"
-2. **Real flow** — user uploads their own CSVs, tap "Examine my records"
+2. **Real flow** — user uploads ANY number of CSVs in any mix (e.g. multiple
+   Salesforce quote pulls + several billing exports); each file is classified
+   as quotes or invoices by its own columns, duplicates across quote pulls
+   keep their first occurrence, and unclassifiable files block the run with
+   a reason (refuse, never guess) — mirroring the engagement engine's
+   /pilot/upload auto-detect. Tap "Examine my records".
 
 Both are client-side; no server, no data leaves your browser.
 
