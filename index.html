@@ -154,7 +154,8 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
 <header class="letter" id="top"><div class="wrap">
   <div class="salutation">TO THE CHIEF FINANCIAL OFFICER:</div>
-  <h1>Your billing does not<br>match your <span class="u">contracts.<svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M2 8 Q 50 2 100 7 T 198 6"/></svg></span></h1>
+  <h1>Verify what was approved<br>matches what got <span class="u">billed.<svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M2 8 Q 50 2 100 7 T 198 6"/></svg></span></h1>
+  <div class="salutation" style="margin-top:16px;color:var(--red)">EVERY DEAL · EVERY INVOICE · EVERY NIGHT — NEVER SILENTLY WRONG.</div>
   <p class="opinion">In our examination of companies operating Salesforce alongside Zuora, Stripe, or NetSuite, we find between <b>1% and 5%</b> of contracted revenue diverging between the quote that was approved and the invoices that followed. We identify the divergence, in dollars, per account, with evidence.</p>
   <div class="ctas">
     <a class="btn primary" href="#s01">Read the findings ↓</a>
@@ -183,7 +184,8 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 
 <section class="sec" id="s02" style="background:var(--paper2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)"><div class="wrap reveal">
   <div class="secno">02 · Examination of Your Records</div>
-  <h2>Conducted entirely<br>within your browser.<span class="fn">2</span></h2>
+  <h2>See it work in 60 seconds<br>— on your data.<span class="fn">2</span></h2>
+  <p class="lede" style="margin-bottom:10px"><i>A one-shot verification. The product runs this nightly, connected to your systems.</i></p>
   <p class="lede">Drop your CSV exports — as many as you like, in any order. Three Salesforce pulls and two billing exports is fine; each file is identified as quotes or invoices by its own columns. The reconciliation runs on your device. Nothing uploads. Nothing persists. Refresh, and it never happened.</p>
   <div class="updrop">
     <label style="grid-column:1/-1"><input type="file" accept=".csv" id="files" hidden multiple>
@@ -206,6 +208,22 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
 </div></section>
 
 <section class="sec"><div class="wrap reveal">
+  <div class="secno">02.5 · The Nightly Examination</div>
+  <h2>What lands in your inbox<br>every morning.</h2>
+  <p class="lede">Connected to your systems, the examination runs every night against every invoice posted that day. When something diverges, you know before your customer does.</p>
+  <div class="sched" style="margin-top:26px">
+    <div class="colhead"><span>From: Genome &lt;examiner@genome&gt; · 06:00</span><span>nightly</span></div>
+    <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">▸</span><span><span class="acct">Subject: 3 new findings · $47,200 new exposure</span><br><span class="why">last night's posting run, reconciled against the quotes in force</span></span></div></div>
+    <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">01</span><span><span class="acct">Northwind Trading</span><br><span class="why">month 7 billed at list, not the amended contract rate</span></span></div><span class="amt">$38,400</span></div>
+    <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">02</span><span><span class="acct">Globex Systems</span><br><span class="why">quantity drift since the March amendment</span></span></div><span class="amt">$6,850</span></div>
+    <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">03</span><span><span class="acct">Initech LLC</span><br><span class="why">invoiced against a quote absent from the CRM</span></span></div><span class="amt">$1,950</span></div>
+    <div class="totrow"><span class="lbl">Verdict: deliverable · evidence attached</span><span class="val mono" style="font-size:20px">$47,200</span></div>
+    <hr class="double">
+  </div>
+  <p class="lede" style="margin-top:16px"><b>That's the paid product</b> — the CSV above is one snapshot.</p>
+</div></section>
+
+<section class="sec"><div class="wrap reveal">
   <div class="secno">03 · Basis of Opinion</div>
   <h2>Our methods.</h2>
   <p class="lede">The examiner cannot be the examined. Your CPQ will not audit your billing; your billing will not audit your CPQ. Independence is not a feature of this instrument — it is the instrument.</p>
@@ -223,15 +241,16 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   <p class="lede">If we find nothing, you owe nothing and sleep better. If we find something, the schedule of findings will argue our case more persuasively than we could.</p>
   <div class="terms">
     <div class="term">
-      <div class="tname">Pilot Examination</div>
+      <div class="tname">Free Verification</div>
       <div class="tdesc">two exports in, findings out — within 48 hours</div>
       <ul><li>Anonymized quote + invoice exports</li><li>Dollarized schedule of findings</li><li>Every line traceable to its quote</li><li><b>No access. No install. No call.</b></li><li>One pilot per company</li></ul>
       <div class="price"><hr class="double"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="p">$0</span><span class="per">one engagement</span></div></div>
       <a class="btn primary" href="#s02">Submit exports →</a>
     </div>
     <div class="term hot">
-      <div class="tname">Continuous Examination</div>
+      <div class="tname">Continuous Monitoring</div>
       <div class="tdesc">every invoice, every night — priced by the revenue we watch, never by seats</div>
+      <div class="tdesc" style="font-style:italic">The real product.</div>
       <ul>
         <li>Up to <b>$5M</b> billing reconciled — <b>$750/mo</b></li>
         <li>Up to <b>$25M</b> — <b>$2,000/mo</b></li>
@@ -247,15 +266,29 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
       <div class="tname">Resident Examiner</div>
       <div class="tdesc">the full instrument, inside your VPC</div>
       <ul><li>Container deployment, your SSO</li><li>Deal-desk governance agent</li><li>Period close, evidence packages, SOD controls</li><li>Policy registry & re-evaluation sweeps</li><li>Evidence graph & blast-radius analysis</li></ul>
-      <div class="price"><hr class="double"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="p">from $75K</span><span class="per">per year</span></div></div>
+      <div class="price"><hr class="double"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="p">from $95K</span><span class="per">per year</span></div></div>
       <a class="btn" href="mailto:dinesh5c9@gmail.com?subject=Resident%20examiner%20%28VPC%29&body=Hi%20DC%2C%0A%0AWe%27re%20interested%20in%20the%20self-hosted%20deployment.%0A%0ACloud%3A%20%5BAWS%20%2F%20GCP%20%2F%20Azure%5D%0AIdP%20%2F%20SSO%3A%20%0ACompliance%20requirements%3A%20%0A%0AThanks%2C">Correspond →</a>
     </div>
   </div>
   <div style="margin-top:26px;border:1px solid var(--rule);background:var(--paper);padding:20px 22px">
     <div class="secno" style="margin-bottom:8px">04.b · Backlog Recovery — the no-budget path</div>
-    <p style="font-size:14px;max-width:640px">Found prior-period leakage in the pilot but no budget line to fix it? We recover it on contingency: <b>15% of recovered prior-period dollars, capped at $25,000</b> — attribution proven by the recovery ledger, every recovered dollar traceable to its finding. Recovery fees credit toward your first year of Continuous Examination.</p>
+    <p style="font-size:14px;max-width:640px">Found prior-period leakage in the pilot but no budget line to fix it? We recover it on contingency: <b>20% of recovered prior-period dollars, capped at $50,000</b> — attribution proven by the recovery ledger, every recovered dollar traceable to its finding. Recovery fees credit toward your first year of Continuous Monitoring.</p>
   </div>
   <div class="mono" style="font-size:10.5px;color:var(--mut);margin-top:18px">fair use: tiers assume up to 50,000 invoice lines/mo · no per-seat pricing, ever · prices held for the length of any annual term</div>
+</div></section>
+
+<section class="sec" id="s045"><div class="wrap reveal">
+  <div class="secno">04.5 · Scope of Examination</div>
+  <h2>What we do not cover.</h2>
+  <p class="lede">An examiner who claims to check everything checks nothing carefully. These are today's boundaries — stated here and returned by the product itself, on every report.</p>
+  <div class="basis">
+    <div><span class="k">NOT COVERED</span><b>Usage quantity</b><p>We verify the rate on usage lines, but take billed quantities at face value — no meter feed is connected. If your billing says 4.2M API calls, we don't have the meter to disagree.</p></div>
+    <div><span class="k">NOT COVERED</span><b>Multi-currency conversion</b><p>Amounts are compared in the currency they arrive in. We flag currency mismatches between quote and invoice; we never convert at a rate we'd have to guess.</p></div>
+    <div><span class="k">NOT COVERED</span><b>Revenue recognition (ASC 606)</b><p>We verify what was billed against what was approved. When revenue is recognized is your controller's judgment and your auditor's opinion — not ours.</p></div>
+    <div><span class="k">NOT COVERED</span><b>Payment reconciliation</b><p>Invoice issued is where our examination ends. Whether the cash arrived, cleared, or bounced belongs to your AR ledger and bank feeds.</p></div>
+    <div><span class="k">NOT COVERED</span><b>Contract-to-CRM drift</b><p>We trust the quote your CRM exports. If the signed paper says something the CRM never captured, that gap is upstream of our evidence chain.</p></div>
+  </div>
+  <p class="lede" style="margin-top:22px">This list shrinks as customers push us. <a href="mailto:dinesh5c9@gmail.com?subject=Coverage%20request">Need one today? Tell us.</a></p>
 </div></section>
 
 <section class="sec" id="s05"><div class="wrap reveal">
@@ -268,6 +301,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     <details class="note"><summary><span class="no">NOTE 6</span><span class="q">Can you connect directly to our systems?</span></summary><p>Yes — any system with an HTTP API, not just the household names. A source is registered as configuration: endpoint, auth (API key, bearer, basic, or OAuth2), pagination. Its records flow through the same field-mapping examination as file uploads, and you preview exactly how its fields mapped before any reconciliation runs. Credentials stay in your environment, referenced by name; the examiner never stores, returns, or logs a secret. Anything ambiguous is refused with the reason — never guessed.</p></details>
     <details class="note"><summary><span class="no">NOTE 4</span><span class="q">What about legitimate exceptions?</span></summary><p>One disposition marks a finding as expected; suppression is scoped to that exact account, item, and issue class — never blanket — and the suppression itself is recorded in the evidence chain. Fixed issues that recur re-flag deliberately.</p></details>
     <details class="note"><summary><span class="no">NOTE 5</span><span class="q">Can our auditors reproduce your figures?</span></summary><p>Yes. Every figure is stamped with the pricing and policy versions in force when it was computed, both immutably registered. Re-derivation is one operation and agrees to the cent.</p></details>
+    <details class="note"><summary><span class="no">NOTE 7</span><span class="q">Do you guarantee correct output?</span></summary><p>No — no tool reading unknown CSVs honestly can. We guarantee that when we can't produce a defensible number, we say so explicitly. Never silently wrong.</p></details>
   </div>
 </div></section>
 
