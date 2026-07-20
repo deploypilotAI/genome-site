@@ -41,6 +41,12 @@ The site runs two reconciliation demos:
    a reason (refuse, never guess) — mirroring the engagement engine's
    /pilot/upload auto-detect. Tap "Examine my records".
 
+Findings mirror the engine's three-tier confidence model: **confirmed**
+findings make the headline total; billing with no quote counterpart is
+**unexplained** (the quote itself could be stale) and subtotaled separately;
+unknown-quote linkage problems are **data gaps** — dollars disclosed, never
+dollarized, attributed to neither side.
+
 Both are client-side; no server, no data leaves your browser.
 
 All logic is in the `<script>` blocks at the end of the HTML.
