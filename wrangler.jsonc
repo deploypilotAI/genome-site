@@ -1,0 +1,15 @@
+// Cloudflare Workers static-assets deployment. The site is four static
+// files with no build step: Workers Builds just runs `npx wrangler deploy`
+// against this config and serves the directory. `_headers` (security
+// headers) and `.assetsignore` (repo files that aren't site content) are
+// honored by Workers static assets the same way Pages honored them.
+{
+  "name": "genome-site",
+  "compatibility_date": "2026-07-20",
+  "assets": {
+    "directory": ".",
+    "html_handling": "auto-trailing-slash",
+    // no 404.html in the repo — unknown paths get a plain 404
+    "not_found_handling": "none"
+  }
+}
