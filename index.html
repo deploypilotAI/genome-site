@@ -9,7 +9,7 @@
 :root{
   --paper:#EDF1E8; --paper2:#F5F7F1; --rule:#C6D3C0; --ink:#17241D;
   --mut:#5C6C60; --red:#AE241C; --redsoft:#F6E7E5; --grn:#2C664B;
-  --grnsoft:#E1ECE4;
+  --grnsoft:#E1ECE4; --amber:#8a6d1a; --ambersoft:#f2ecd7;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 #top,#s01,#s02,#s04,#s05{scroll-margin-top:78px}
@@ -81,6 +81,16 @@ hr.double{border:0;border-top:1px solid var(--ink);border-bottom:3px double var(
 .li .acct{font-weight:700;font-size:16px}
 .li .why{color:var(--mut);font-size:13px;font-style:italic}
 .li .amt{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--red);white-space:nowrap}
+.li .amt.unexpl{color:var(--amber)}
+.li .amt.gap{color:var(--mut);font-weight:400}
+.tierchip{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  border-radius:9px;padding:1px 8px;vertical-align:middle;white-space:nowrap}
+.tierchip.unexpl{background:var(--ambersoft);color:var(--amber)}
+.tierchip.gap{background:var(--paper);color:var(--mut);border:1px solid var(--rule)}
+.subtot{display:flex;justify-content:space-between;padding:8px 0 0;align-items:baseline}
+.subtot .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+.subtot .val{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--amber)}
+.subtot.gaply .lbl,.subtot.gaply .val{color:var(--mut);font-size:10px;font-weight:400;text-transform:none;letter-spacing:.02em}
 .totrow{display:flex;justify-content:space-between;padding:14px 0 6px;align-items:baseline}
 .totrow .lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
 .totrow .val{font-family:'IBM Plex Mono',monospace;font-size:clamp(26px,4.5vw,36px);font-weight:600;color:var(--red)}
@@ -176,7 +186,8 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     <div class="stamp" id="stamp">evidence<br>chain<br>verified</div>
     <div class="colhead"><span>Account · Nature of finding</span><span>Amount</span></div>
     <div id="rows"></div>
-    <div class="totrow"><span class="lbl">Total exposure, Q1</span><span class="val mono" id="counter">$0</span></div>
+    <div class="totrow"><span class="lbl">Total exposure, Q1 · confirmed</span><span class="val mono" id="counter">$0</span></div>
+    <div class="subtot gaply" id="specGap" style="display:none"><span class="lbl">+ $1,200 billed against a quote absent from the CRM — a data gap: disclosed above, dollarized never</span><span class="val"></span></div>
     <hr class="double">
     <div style="margin-top:20px"><button class="btn red" id="run">Run the specimen examination</button></div>
   </div>
@@ -201,10 +212,12 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   <div class="sched" id="realSched" style="display:none;margin-top:22px">
     <div class="colhead"><span>Account · Nature of finding</span><span>Amount</span></div>
     <div id="realRows"></div>
-    <div class="totrow"><span class="lbl">Total exposure</span><span class="val mono" id="realTotal">$0</span></div>
+    <div class="totrow"><span class="lbl">Total exposure · confirmed</span><span class="val mono" id="realTotal">$0</span></div>
+    <div class="subtot" id="realUnexpl" style="display:none"><span class="lbl">Needs verification · unexplained — not in the total above</span><span class="val"></span></div>
+    <div class="subtot gaply" id="realGap" style="display:none"><span class="lbl"></span><span class="val"></span></div>
     <hr class="double">
   </div>
-  <div class="scopeline">browser scope: monthly billing · price, quantity, missing-line, unknown-quote checks. the engagement engine adds credit netting, amendments, ramps, usage rates, billing windows, currencies.</div>
+  <div class="scopeline">browser scope: monthly billing · price, quantity, missing-line, unknown-quote checks — findings tiered by confidence: confirmed makes the total, unexplained is subtotaled apart, data gaps are disclosed, never dollarized. the engagement engine adds credit netting, amendments, ramps, usage rates, billing windows, currencies.</div>
 </div></section>
 
 <section class="sec"><div class="wrap reveal">
@@ -213,11 +226,11 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   <p class="lede">Connected to your systems, the examination runs every night against every invoice posted that day. When something diverges, you know before your customer does.</p>
   <div class="sched" style="margin-top:26px">
     <div class="colhead"><span>From: Genome &lt;examiner@genome&gt; · 06:00</span><span>nightly</span></div>
-    <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">▸</span><span><span class="acct">Subject: 3 new findings · $47,200 new exposure</span><br><span class="why">last night's posting run, reconciled against the quotes in force</span></span></div></div>
+    <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">▸</span><span><span class="acct">Subject: 3 new findings · $45,250 new confirmed exposure · 1 data gap</span><br><span class="why">last night's posting run, reconciled against the quotes in force</span></span></div></div>
     <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">01</span><span><span class="acct">Northwind Trading</span><br><span class="why">month 7 billed at list, not the amended contract rate</span></span></div><span class="amt">$38,400</span></div>
     <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">02</span><span><span class="acct">Globex Systems</span><br><span class="why">quantity drift since the March amendment</span></span></div><span class="amt">$6,850</span></div>
-    <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">03</span><span><span class="acct">Initech LLC</span><br><span class="why">invoiced against a quote absent from the CRM</span></span></div><span class="amt">$1,950</span></div>
-    <div class="totrow"><span class="lbl">Verdict: deliverable · evidence attached</span><span class="val mono" style="font-size:20px">$47,200</span></div>
+    <div class="li"><div style="display:flex;gap:10px;align-items:baseline"><span class="idx">03</span><span><span class="acct">Initech LLC</span><br><span class="why">invoiced against a quote absent from the CRM — disclosed, attributed to neither side</span></span></div><span class="amt gap">($1,950) <span class="tierchip gap">data gap · not counted</span></span></div>
+    <div class="totrow"><span class="lbl">Verdict: deliverable · evidence attached</span><span class="val mono" style="font-size:20px">$45,250</span></div>
     <hr class="double">
   </div>
   <p class="lede" style="margin-top:16px"><b>That's the paid product</b> — the CSV above is one snapshot.</p>
@@ -232,6 +245,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     <div><span class="k">III.b</span><b>Hash-chained evidence</b><p>Each decision is bound to the one before it. Alter any historical record and the chain breaks from that point forward — detectably, provably, permanently.</p></div>
     <div><span class="k">III.c</span><b>Reproducible to the cent</b><p>Every calculation is stamped with its pricing and policy version, both immutably registered. Any figure from any date can be re-derived on demand — byte for byte.</p></div>
     <div><span class="k">III.d</span><b>Confined to your premises</b><p>Deploys by container inside your network, behind your SSO. In pilot form it requires no access whatsoever: two exported files, examined and returned.</p></div>
+    <div><span class="k">III.e</span><b>Three tiers of confidence</b><p>Every finding declares how sure we are that the quote is the correct side. Confirmed findings make the headline total. Billing with no quote counterpart is <i>unexplained</i> — the quote itself may be stale — and is subtotaled apart, never blended in. Export and linkage problems are <i>data gaps</i>: disclosed, never dollarized, attributed to neither side.</p></div>
   </div>
 </div></section>
 
@@ -302,6 +316,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
     <details class="note"><summary><span class="no">NOTE 4</span><span class="q">What about legitimate exceptions?</span></summary><p>One disposition marks a finding as expected; suppression is scoped to that exact account, item, and issue class — never blanket — and the suppression itself is recorded in the evidence chain. Fixed issues that recur re-flag deliberately.</p></details>
     <details class="note"><summary><span class="no">NOTE 5</span><span class="q">Can our auditors reproduce your figures?</span></summary><p>Yes. Every figure is stamped with the pricing and policy versions in force when it was computed, both immutably registered. Re-derivation is one operation and agrees to the cent.</p></details>
     <details class="note"><summary><span class="no">NOTE 7</span><span class="q">Do you guarantee correct output?</span></summary><p>No — no tool reading unknown CSVs honestly can. We guarantee that when we can't produce a defensible number, we say so explicitly. Never silently wrong.</p></details>
+    <details class="note"><summary><span class="no">NOTE 8</span><span class="q">What if our quote export is the stale side?</span></summary><p>Every report states its core assumption: the approved quote is treated as the source of truth. Where that assumption is load-bearing — billing with no quote counterpart, or a period deliberately credited to zero — the finding is tiered <i>unexplained</i> and subtotaled apart from the headline, because a documented amendment or side letter billed correctly but never fed back into the CPQ would look identical. Verify those against amendment history before remediating; the report tells you exactly which ones they are.</p></details>
   </div>
 </div></section>
 
@@ -328,25 +343,33 @@ $("ticker").innerHTML=(KINDS.concat(KINDS)).map(k=>`<span>▸ <b>finding:</b> ${
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("on");io.unobserve(e.target);}}),{threshold:.12});
 document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
 // ── specimen examination ──
-const F=[{who:"Northwind Trading",why:"month 3 billed at list price, not the contracted rate",amt:2160},
- {who:"Globex Systems",why:"underbilled quantity since the February amendment",amt:1710},
- {who:"Umbrella Health",why:"invoiced against a quote absent from the CRM",amt:1200},
- {who:"Initech LLC",why:"February was never invoiced at all",amt:950}];
-const TOTAL=F.reduce((s,f)=>s+f.amt,0);
+// findings carry the engine's confidence tier: confirmed counts in the
+// headline; unexplained is subtotaled separately (the quote itself could
+// be the stale side); data gaps are disclosed but never dollarized.
+const F=[{who:"Northwind Trading",why:"month 3 billed at list price, not the contracted rate",amt:2160,tier:"confirmed"},
+ {who:"Globex Systems",why:"underbilled quantity since the February amendment",amt:1710,tier:"confirmed"},
+ {who:"Umbrella Health",why:"invoiced against a quote absent from the CRM — dollars disclosed, attributed to neither side",amt:1200,tier:"gap"},
+ {who:"Initech LLC",why:"February was never invoiced at all",amt:950,tier:"confirmed"}];
+const TOTAL=F.filter(f=>f.tier==="confirmed").reduce((s,f)=>s+f.amt,0);
+const amtCell=f=>f.tier==="gap"
+  ?`<span class="amt gap">($${f.amt.toLocaleString()}) <span class="tierchip gap">data gap · not counted</span></span>`
+  :f.tier==="unexpl"
+  ?`<span class="amt unexpl">$${f.amt.toLocaleString()} <span class="tierchip unexpl">needs verification</span></span>`
+  :`<span class="amt">$${f.amt.toLocaleString()}</span>`;
 let ran=false;
 $("run").addEventListener("click",()=>{if(ran)return;ran=true;
  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
  $("run").textContent="Examining…";
  F.forEach((f,i)=>{setTimeout(()=>{
    const d=document.createElement("div");d.className="li reveal";
-   d.innerHTML=`<div style="display:flex;gap:10px;align-items:baseline"><span class="idx">${String(i+1).padStart(2,"0")}</span><span><span class="acct">${f.who}</span><br><span class="why">${f.why}</span></span></div><span class="amt">$${f.amt.toLocaleString()}</span>`;
+   d.innerHTML=`<div style="display:flex;gap:10px;align-items:baseline"><span class="idx">${String(i+1).padStart(2,"0")}</span><span><span class="acct">${f.who}</span><br><span class="why">${f.why}</span></span></div>${amtCell(f)}`;
    $("rows").appendChild(d);requestAnimationFrame(()=>d.classList.add("on"));
  },reduce?0:350+i*260);});
  const t0=performance.now(),dur=reduce?0:1500;
  (function tick(t){const p=dur?Math.min(1,(t-t0)/dur):1,e=1-Math.pow(1-p,3);
   $("counter").textContent="$"+Math.round(TOTAL*e).toLocaleString();
   if(p<1)requestAnimationFrame(tick);})(t0);
- setTimeout(()=>{$("stamp").classList.add("show");
+ setTimeout(()=>{$("stamp").classList.add("show");$("specGap").style.display="flex";
   $("run").textContent="Examination complete — every line traceable";$("run").disabled=true;},reduce?0:1700);});
 // ── real in-browser examination ──
 const SYN={quote_id:["quote id","quote number","quote no","proposal id","created from","quote","opportunity id","deal id","quote ref","contract id","order number"],
@@ -457,6 +480,7 @@ INV-90112,Q-2026-0392,Globex Systems,ONBOARD,1,5000.00,"5,000.00",2026-01-20
 INV-90188,Q-2026-0392,Globex Systems,ENT-SEAT,40,114.00,"4,560.00",2026-02-20
 INV-91050,Q-2026-0455,Initech LLC,ENT-SEAT,30,108.00,"3,240.00",2026-01-10
 INV-91050,Q-2026-0455,Initech LLC,API-PACK,2,475.00,"950.00",2026-01-10
+INV-91055,Q-2026-0455,Initech LLC,SUPPORT-PLUS,1,800.00,"800.00",2026-02-10
 INV-93001,Q-2026-0777,Wayne Enterprises,ENT-SEAT,5,120.00,"600.00",2026-01-05`);
  uploads=[{name:"sf_quotes_pull_1.csv",rows:sf1,...classifyFile(sf1)},
   {name:"sf_quotes_pull_2.csv",rows:sf2,...classifyFile(sf2)},
@@ -484,27 +508,43 @@ $("runReal").addEventListener("click",()=>{try{
  const fmt=u=>`<div>${u.name} — ${Object.keys(u.map).map(f=>`<span class="mono">${f}→${u.map[f]}</span> ${u.how[f]==="matched"?"✓":"?"}`).join(" · ")}</div>`;
  const note=capped?`<div style="color:var(--red);margin-bottom:8px">Examining the first 100 lines per file of ${total.toLocaleString()} total. The full engagement examines every line, every month — with credits, amendments, ramps, and usage rates.</div>`:"";
  $("mapinfo").innerHTML=note+qs.concat(is).map(fmt).join("");
- // ── reconcile ──
- const out=[];let leak=0;const billed={};
+ // ── reconcile — findings carry the engine's confidence tier ──
+ //    confirmed:   the approved quote is authoritative → headline total
+ //    unexplained: invoice-side value with no quote counterpart — the
+ //                 quote itself could be stale → separate subtotal,
+ //                 never blended into the headline
+ //    gap:         export/linkage problem (unknown quote) → dollars
+ //                 disclosed, never dollarized, attributed to neither side
+ const out=[];let leak=0,unexpl=0,gapDollars=0;const billed={};
  for(const L of lines){const q=quotes[L.qid],acct=L.acct||L.qid;
-  if(!q){out.push({who:acct,why:`invoiced against unknown quote ${L.qid}`,amt:Math.abs(L.tot)});leak+=Math.abs(L.tot);continue;}
+  if(!q){gapDollars+=Math.abs(L.tot);
+   out.push({who:acct,why:`invoiced against unknown quote ${L.qid}`,amt:Math.abs(L.tot),tier:"gap"});continue;}
   (billed[L.qid]=billed[L.qid]||new Set()).add(L.sku);
-  const ql=q[L.sku];if(!ql){out.push({who:acct,why:`${L.sku} billed but absent from quote ${L.qid}`,amt:Math.abs(L.tot)});leak+=Math.abs(L.tot);continue;}
+  const ql=q[L.sku];if(!ql){unexpl+=Math.abs(L.tot);
+   out.push({who:acct,why:`${L.sku} billed but absent from quote ${L.qid} — the quote may be the stale side; verify before treating as a billing error`,amt:Math.abs(L.tot),tier:"unexpl"});continue;}
   const exp=ql.price*L.qty,d=L.tot-exp;
-  if(Math.abs(d)>Math.max(.01,exp*.001)){out.push({who:acct,why:`${L.sku} billed off the contracted price (${d>0?"over":"under"})`,amt:Math.abs(d)});leak+=Math.abs(d);}
-  else if(L.qty!==ql.qty){const dq=Math.abs(ql.qty-L.qty)*ql.price;out.push({who:acct,why:`${L.sku}: quantity ${L.qty} against approved ${ql.qty}`,amt:dq});leak+=dq;}}
+  if(Math.abs(d)>Math.max(.01,exp*.001)){out.push({who:acct,why:`${L.sku} billed off the contracted price (${d>0?"over":"under"})`,amt:Math.abs(d),tier:"confirmed"});leak+=Math.abs(d);}
+  else if(L.qty!==ql.qty){const dq=Math.abs(ql.qty-L.qty)*ql.price;out.push({who:acct,why:`${L.sku}: quantity ${L.qty} against approved ${ql.qty}`,amt:dq,tier:"confirmed"});leak+=dq;}}
  // ── approved but never invoiced — including quotes with NO invoices at all ──
  for(const qid of Object.keys(quotes)){const skus=billed[qid]||new Set();
   for(const sku of Object.keys(quotes[qid]))if(!skus.has(sku)){
    const ql=quotes[qid][sku],amt=ql.price*ql.qty;
-   out.push({who:qAcct[qid]||qid,why:`${sku} approved but never invoiced`,amt});leak+=amt;}}
+   out.push({who:qAcct[qid]||qid,why:`${sku} approved but never invoiced`,amt,tier:"confirmed"});leak+=amt;}}
  const rows=$("realRows");rows.innerHTML="";$("realSched").style.display="block";
  out.sort((a,b)=>b.amt-a.amt).slice(0,12).forEach((f,i)=>{const d=document.createElement("div");
-  d.className="li";d.innerHTML=`<div style="display:flex;gap:10px;align-items:baseline"><span class="idx">${String(i+1).padStart(2,"0")}</span><span><span class="acct">${f.who}</span><br><span class="why">${f.why}</span></span></div><span class="amt">$${Math.round(f.amt).toLocaleString()}</span>`;
+  d.className="li";d.innerHTML=`<div style="display:flex;gap:10px;align-items:baseline"><span class="idx">${String(i+1).padStart(2,"0")}</span><span><span class="acct">${f.who}</span><br><span class="why">${f.why}</span></span></div>${
+   f.tier==="gap"?`<span class="amt gap">($${Math.round(f.amt).toLocaleString()}) <span class="tierchip gap">data gap · not counted</span></span>`
+   :f.tier==="unexpl"?`<span class="amt unexpl">$${Math.round(f.amt).toLocaleString()} <span class="tierchip unexpl">needs verification</span></span>`
+   :`<span class="amt">$${Math.round(f.amt).toLocaleString()}</span>`}`;
   rows.appendChild(d);});
  const t=$("realTotal");
- t.textContent=out.length?"$"+Math.round(leak).toLocaleString():"— nil —";
- t.style.color=out.length?"var(--red)":"var(--grn)";
+ t.textContent=out.some(f=>f.tier==="confirmed")?"$"+Math.round(leak).toLocaleString():"— nil —";
+ t.style.color=leak>0?"var(--red)":"var(--grn)";
+ const ux=$("realUnexpl");ux.style.display=unexpl>0?"flex":"none";
+ if(unexpl>0)ux.querySelector(".val").textContent="$"+Math.round(unexpl).toLocaleString();
+ const gp=$("realGap");gp.style.display=gapDollars>0?"flex":"none";
+ if(gapDollars>0)gp.querySelector(".lbl").textContent=
+  `+ $${Math.round(gapDollars).toLocaleString()} billed against quotes absent from the export — a data gap: disclosed above, dollarized never`;
  $("runReal").textContent="Examined — "+out.length+" finding"+(out.length===1?"":"s");
  $("realSched").scrollIntoView({behavior:"smooth",block:"center"});
 }catch(err){$("mapinfo").textContent="⚠ could not read those files: "+err.message+" — check they are comma-separated CSVs with header rows";}});
