@@ -1,0 +1,7 @@
+# Repo files that are not site content — excluded from the deployed assets.
+.git
+README.md
+wrangler.jsonc
+.cfignore
+.assetsignore
+GENOME_DEPLOY_WALKTHROUGH.md

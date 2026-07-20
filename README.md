@@ -15,7 +15,9 @@ This is a static HTML file. Open `index.html` in your browser to preview.
 
 ## Deployment
 
-See `GENOME_DEPLOY_WALKTHROUGH.md` for step-by-step instructions to deploy to Cloudflare Pages.
+Cloudflare Workers Builds deploys automatically on every push to `main`:
+`wrangler.jsonc` serves the repo as static assets (no build step). `_headers`
+is honored; `.assetsignore` keeps non-site files out of the deployment.
 
 ## Making Changes
 
